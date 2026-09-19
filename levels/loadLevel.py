@@ -27,7 +27,7 @@ def _mergeRuns(cells):
 
     while col < len(cells):
         cell = cells[col]
-        if cell not in ('_', '*'):
+        if cell not in ('_', '*', '#'):
             col += 1
             continue
 
@@ -57,5 +57,7 @@ def loadLevel(color=(255, 255, 255)):
                 grounds.append(ground)
             elif cell == '*':
                 grounds.append(Boxes(Rectangle(f"box_{row}_{startCol}", [x, y], [width, TILE_SIZE], (0, 0, 255))))
+            elif cell == '#':
+                grounds.append(Ground(Rectangle(f"border_{row}_{startCol}", [x, y], [width, TILE_SIZE], color)))
 
     return grounds

@@ -34,7 +34,7 @@ class Game():
         self.objects = [player, *grounds]
         self.inputHandler = InputHandler(self.objects)
         self.collisionSystem = CollisionSystem(self.objects)
-        self.cameraZoom = 1
+        self.cameraZoom = 1.2
 
         self.delta = 0
         self.prevTime = time()
