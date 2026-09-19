@@ -1,4 +1,5 @@
 from .renderObjects import Renderer
 from .hud import HUD
 from .camera import Camera
+from .background import Background
 from . import easing

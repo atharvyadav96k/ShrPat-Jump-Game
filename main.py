@@ -1,7 +1,7 @@
 import os
 import pygame
 from time import time
-from renderer import Renderer, HUD, Camera, easing
+from renderer import Renderer, HUD, Camera, Background, easing
 from gameevents import Obstacle, InputHandler, CollisionSystem
 from gameobjects import Player
 from levels import loadLevel, getLevelSize
@@ -19,8 +19,11 @@ canvas = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("My Board")
 
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets", "female-character")
+BG_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "assets", "bg.png")
+BACKGROUND_PARALLAX = 0.3
 
 player = Player.fromAssets(ASSETS_DIR, [100, 0], PLAYER_SIZE)
+background = Background(pygame.image.load(BG_IMAGE_PATH).convert(), parallaxFactor=BACKGROUND_PARALLAX)
 
 grounds = loadLevel()
 LEVEL_WIDTH, LEVEL_HEIGHT = getLevelSize()
@@ -68,7 +71,7 @@ class Game():
             self.camera.update(self.delta)
             self.camera.follow(player)
 
-            self.renderer.draw(self.objects, self.camera.getOffset(), self.camera.zoom)
+            self.renderer.draw(self.objects, self.camera.getOffset(), self.camera.zoom, background)
             self.hud.render()
             pygame.display.update()
 
