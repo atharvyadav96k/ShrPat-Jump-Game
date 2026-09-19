@@ -1,5 +1,8 @@
+from .easing import easeOutQuad
+
+
 class Camera:
-    def __init__(self, screenWidth, screenHeight, levelWidth=None, levelHeight=None, zoomSmoothing=4.0):
+    def __init__(self, screenWidth, screenHeight, levelWidth=None, levelHeight=None, zoomDuration=0.5, easing=easeOutQuad):
         self.screenWidth = screenWidth
         self.screenHeight = screenHeight
         self.levelWidth = levelWidth
@@ -7,21 +10,33 @@ class Camera:
         self.x = 0
         self.y = 0
         self.zoom = 1.0
+        self.zoomStart = 1.0
         self.targetZoom = 1.0
-        self.zoomSmoothing = zoomSmoothing
+        self.zoomDuration = zoomDuration
+        self.zoomElapsed = 0
+        self.easing = easing
 
-    def setZoom(self, zoom):
+    def setZoom(self, zoom, duration=None, easing=None):
+        if zoom == self.targetZoom:
+            return
+
+        self.zoomStart = self.zoom
         self.targetZoom = zoom
+        self.zoomElapsed = 0
+
+        if duration is not None:
+            self.zoomDuration = duration
+
+        if easing is not None:
+            self.easing = easing
 
     def update(self, delta):
         if self.zoom == self.targetZoom:
             return
 
-        t = min(1, self.zoomSmoothing * delta)
-        self.zoom += (self.targetZoom - self.zoom) * t
-
-        if abs(self.targetZoom - self.zoom) < 0.001:
-            self.zoom = self.targetZoom
+        self.zoomElapsed += delta
+        t = min(1, self.zoomElapsed / self.zoomDuration) if self.zoomDuration > 0 else 1
+        self.zoom = self.zoomStart + (self.targetZoom - self.zoomStart) * self.easing(t)
 
     def follow(self, target):
         viewWidth = self.screenWidth / self.zoom

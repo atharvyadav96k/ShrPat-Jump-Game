@@ -1,7 +1,7 @@
 import pygame
 from time import time
 from objects import Rectangle
-from renderer import Renderer, HUD, Camera
+from renderer import Renderer, HUD, Camera, easing
 from gameevents import Obstacle, InputHandler, CollisionSystem
 from gameobjects import Player
 from levels import loadLevel, getLevelSize
@@ -52,7 +52,11 @@ class Game():
             self.renderer.update(self.objects, self.delta)
             self.collisionSystem.resolve()
 
-            self.camera.setZoom(1.0 if player.grounded else 0.8)
+            if player.grounded:
+                self.camera.setZoom(1.0, duration=0.35, easing=easing.easeOutCubic)
+            else:
+                self.camera.setZoom(0.8, duration=0.5, easing=easing.easeOutQuad)
+
             self.camera.update(self.delta)
             self.camera.follow(player)
 
