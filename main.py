@@ -1,7 +1,7 @@
 import pygame
 from time import time
 from objects import Rectangle
-from renderer import Renderer
+from renderer import Renderer, HUD
 from gameevents import ControllableObject, Player, Obstacle, InputHandler, CollisionSystem
 
 pygame.init()
@@ -30,6 +30,7 @@ class Game():
     def __init__(self):
         self.exit = False
         self.renderer = Renderer(canvas)
+        self.hud = HUD(canvas, player)
         self.objects = [player, ground1, ground2, opstical]
         self.inputHandler = InputHandler(self.objects)
         self.collisionSystem = CollisionSystem(self.objects)
@@ -55,6 +56,7 @@ class Game():
             canvas.fill((0, 0, 0))
             self.renderer.render(self.objects, self.delta)
             self.collisionSystem.resolve()
+            self.hud.render()
             pygame.display.update()
 
         pygame.quit()
