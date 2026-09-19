@@ -4,15 +4,18 @@ from .object import Object
 
 
 class Rectangle(Object):
-    def __init__(self, rectCords, rectSize):
+    def __init__(self, objectName,rectCords, rectSize):
         self.color = (255, 255, 255)
-
+        self.objectName = objectName
         self.rectCords = [
             rectCords[0],
             rectCords[1],
             rectSize[0],
             rectSize[1]
         ]
+
+    def getObjName(self):
+        return self.objectName
 
     def moveObject(self, directionAngle, directionSpeed, delta):
         angle = math.radians(directionAngle)
