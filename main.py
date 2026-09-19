@@ -17,11 +17,11 @@ player = ControllableObject(
     },
     speedBindings={
         pygame.K_RIGHT: (0, 200),
-        pygame.K_LEFT: (180, 400),
+        pygame.K_LEFT: (180, 200),
     },
     collidable=True,
     gravity=True,
-    friction=200,
+    friction=0,
 )
 
 ground = ControllableObject(
@@ -30,11 +30,17 @@ ground = ControllableObject(
     rigid=True,
 )
 
+opstical = ControllableObject(
+    Rectangle("wall", [400, 100], [50, 50], (255, 0, 0)),
+    collidable=True,
+    gravity=True
+)
+
 class Game():
     def __init__(self):
         self.exit = False
         self.renderer = Renderer(canvas)
-        self.objects = [player, ground]
+        self.objects = [player, ground, opstical]
         self.inputHandler = InputHandler(self.objects)
         self.collisionSystem = CollisionSystem(self.objects)
 
