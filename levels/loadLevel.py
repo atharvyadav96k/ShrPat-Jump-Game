@@ -8,6 +8,7 @@ TILE_SIZE = 50
 GROUND_TOP_INSET = 10
 GROUND_Z_INDEX = 4
 GRASS_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "ground", "grass")
+BOX_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "particles", "sparks")
 
 
 def _loadGrassTiles():
@@ -56,7 +57,7 @@ def loadLevel(color=(255, 255, 255)):
                 ground.setHitbox(offset=(0, GROUND_TOP_INSET), size=(width, TILE_SIZE - GROUND_TOP_INSET))
                 grounds.append(ground)
             elif cell == '*':
-                grounds.append(Boxes(Rectangle(f"box_{row}_{startCol}", [x, y], [width, TILE_SIZE], (0, 0, 255))))
+                grounds.append(Boxes.fromAssets(BOX_DIR, [x, y], [width, TILE_SIZE]))
             elif cell == '#':
                 grounds.append(Ground(Rectangle(f"border_{row}_{startCol}", [x, y], [width, TILE_SIZE], color)))
 

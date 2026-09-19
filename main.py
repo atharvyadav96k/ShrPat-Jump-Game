@@ -23,7 +23,7 @@ pygame.display.set_caption("My Board")
 
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets", "female-character")
 BG_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "assets", "bg.png")
-BACKGROUND_PARALLAX = 0.3
+BACKGROUND_PARALLAX = 0.8
 
 player = Player.fromAssets(ASSETS_DIR, [100, 0], PLAYER_SIZE)
 background = Background(
