@@ -24,23 +24,28 @@ player = ControllableObject(
     friction=0,
 )
 
-ground = ControllableObject(
-    Rectangle("background", [0, 201], [1200, 100], (255, 255, 255)),
+ground1 = ControllableObject(
+    Rectangle("background", [0, 201], [900, 100], (255, 255, 255)),
+    collidable=True,
+    rigid=True,
+)
+
+ground2 = ControllableObject(
+    Rectangle("background", [300, 501], [900, 100], (255, 255, 255)),
     collidable=True,
     rigid=True,
 )
 
 opstical = ControllableObject(
-    Rectangle("wall", [400, 100], [50, 50], (255, 0, 0)),
-    collidable=True,
-    gravity=True
+    Rectangle("wall", [400, 150], [50, 50], (255, 0, 0)),
+    collidable=True
 )
 
 class Game():
     def __init__(self):
         self.exit = False
         self.renderer = Renderer(canvas)
-        self.objects = [player, ground, opstical]
+        self.objects = [player, ground1, ground2, opstical]
         self.inputHandler = InputHandler(self.objects)
         self.collisionSystem = CollisionSystem(self.objects)
 
