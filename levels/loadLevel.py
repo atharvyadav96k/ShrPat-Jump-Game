@@ -1,5 +1,5 @@
 from objects import Rectangle
-from gameobjects import Ground
+from gameobjects import Ground, Boxes
 from .map import map as levelMap
 
 
@@ -13,11 +13,17 @@ def loadLevel(screenWidth, screenHeight, color=(255, 255, 255)):
 
     for row, cells in enumerate(levelMap):
         for col, cell in enumerate(cells):
-            if cell != '_':
-                continue
+            if cell == '_':
+                x = col * tileWidth
+                y = row * tileHeight
+                grounds.append(Ground(Rectangle(f"ground_{row}_{col}", [x, y], [tileWidth, tileHeight], color)))
 
-            x = col * tileWidth
-            y = row * tileHeight
-            grounds.append(Ground(Rectangle(f"ground_{row}_{col}", [x, y], [tileWidth, tileHeight], color)))
+            elif cell == '*':
+                x = col * tileWidth
+                y = row * tileHeight
+                grounds.append(Boxes(Rectangle(f"ground_{row}_{col}", [x, y], [tileWidth, tileHeight], (0, 0, 255))))
+
+
+            
 
     return grounds
