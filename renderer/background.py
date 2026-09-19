@@ -2,9 +2,9 @@ import pygame
 
 
 class Background:
-    def __init__(self, image, parallaxFactor=0.3, referenceHeight=720, heightMargin=1.8):
+    def __init__(self, image, parallaxFactor=0.3, screenHeight=720, minZoom=1.0):
         self.parallaxFactor = parallaxFactor
-        height = int(referenceHeight * heightMargin)
+        height = int(screenHeight / minZoom)
         width = int(image.get_width() * (height / image.get_height()))
         self.image = pygame.transform.scale(image, (width, height))
 

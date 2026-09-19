@@ -14,6 +14,9 @@ EDGE_ZOOM_MARGIN = 80
 ZOOM_DURATION = 0.4
 ZOOM_EASING = easing.easeOutQuad
 PLAYER_SIZE = [42, 70]
+CAMERA_ZOOM = 1.2
+EDGE_ZOOM_OUT_FACTOR = 0.6
+MIN_ZOOM = CAMERA_ZOOM * EDGE_ZOOM_OUT_FACTOR
 
 canvas = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("My Board")
@@ -23,7 +26,12 @@ BG_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "assets", "bg.png")
 BACKGROUND_PARALLAX = 0.3
 
 player = Player.fromAssets(ASSETS_DIR, [100, 0], PLAYER_SIZE)
-background = Background(pygame.image.load(BG_IMAGE_PATH).convert(), parallaxFactor=BACKGROUND_PARALLAX)
+background = Background(
+    pygame.image.load(BG_IMAGE_PATH).convert(),
+    parallaxFactor=BACKGROUND_PARALLAX,
+    screenHeight=SCREEN_HEIGHT,
+    minZoom=MIN_ZOOM,
+)
 
 grounds = loadLevel()
 LEVEL_WIDTH, LEVEL_HEIGHT = getLevelSize()
@@ -37,7 +45,7 @@ class Game():
         self.objects = [player, *grounds]
         self.inputHandler = InputHandler(self.objects)
         self.collisionSystem = CollisionSystem(self.objects)
-        self.cameraZoom = 1.2
+        self.cameraZoom = CAMERA_ZOOM
 
         self.delta = 0
         self.prevTime = time()
@@ -64,7 +72,7 @@ class Game():
             self.camera.follow(player)
 
             if self.camera.shouldZoomOut(player, triggerMargin=EDGE_ZOOM_MARGIN):
-                self.camera.setZoom(self.cameraZoom * 0.6, duration=ZOOM_DURATION, easing=ZOOM_EASING)
+                self.camera.setZoom(MIN_ZOOM, duration=ZOOM_DURATION, easing=ZOOM_EASING)
             else:
                 self.camera.setZoom(self.cameraZoom, duration=ZOOM_DURATION, easing=ZOOM_EASING)
 
