@@ -2,7 +2,7 @@ import os
 import pygame
 from objects import TiledImage
 from gameobjects import Ground, WoodBox, KillObstacle
-from .map import map as levelMap
+from .map import map as DEFAULT_MAP
 
 TILE_SIZE = 50
 GROUND_TOP_INSET = 10
@@ -15,7 +15,8 @@ def _loadGrassTiles():
     return [pygame.image.load(os.path.join(GRASS_DIR, f)).convert_alpha() for f in files]
 
 
-def getLevelSize():
+def getLevelSize(levelMap=None):
+    levelMap = levelMap if levelMap is not None else DEFAULT_MAP
     rows = len(levelMap)
     cols = len(levelMap[0])
     return cols * TILE_SIZE, rows * TILE_SIZE
@@ -40,7 +41,8 @@ def _mergeRuns(cells):
     return runs
 
 
-def loadLevel():
+def loadLevel(levelMap=None):
+    levelMap = levelMap if levelMap is not None else DEFAULT_MAP
     grassTiles = _loadGrassTiles()
     grounds = []
 
