@@ -2,10 +2,10 @@ import os
 import pygame
 from renderer import Renderer, HUD, Camera, Background, easing
 from gameevents import InputHandler, CollisionSystem
-from gameobjects import Player
+from gameobjects import Player, ScoreCoin, JumpCoin
 from levels import loadLevel, getLevelSize
 from levels.maps import MAPS
-from gamescreen import GameOverScreen, PauseScreen, StartScreen, LevelSelectScreen
+from gamescreen import GameOverScreen, PauseScreen, StartScreen, LevelSelectScreen, WinScreen
 from ui import Root, Button
 
 EDGE_ZOOM_MARGIN = 80
@@ -61,6 +61,10 @@ class Game:
         self.cameraZoom = CAMERA_ZOOM
         self.gameOverScreen = GameOverScreen(canvas, onRestart=self.restart, onQuit=self._quit)
 
+        self.totalCoins = self._countCoins(grounds)
+        self.won = False
+        self.winScreen = WinScreen(canvas, onRestart=self.restart, onQuit=self._quit)
+
         self.paused = False
         self.pauseScreen = PauseScreen(canvas, onResume=self.togglePause, onQuit=self._quit)
         pauseButtonImage = pygame.image.load(PAUSE_BUTTON_IMAGE_PATH).convert_alpha()
@@ -72,17 +76,26 @@ class Game:
 
     def restart(self):
         self.player = Player.fromAssets(ASSETS_DIR, PLAYER_START, PLAYER_SIZE)
-        self.objects = [self.player, *loadLevel(self.levelMap)]
+        grounds = loadLevel(self.levelMap)
+        self.objects = [self.player, *grounds]
         self.inputHandler = InputHandler(self.objects)
         self.collisionSystem = CollisionSystem(self.objects)
         self.hud.player = self.player
         self.gameOverScreen.hide()
 
+        self.totalCoins = self._countCoins(grounds)
+        self.won = False
+        self.winScreen.hide()
+
+    @staticmethod
+    def _countCoins(objects):
+        return sum(1 for obj in objects if isinstance(obj, (ScoreCoin, JumpCoin)))
+
     def _quit(self):
         self.manager.setScreen(buildStartScreen(self.canvas, self.manager))
 
     def togglePause(self):
-        if self.player is None:
+        if self.player is None or self.won:
             return
 
         self.paused = not self.paused
@@ -99,7 +112,9 @@ class Game:
 
         self.pauseUI.handleEvent(event)
 
-        if self.paused:
+        if self.won:
+            self.winScreen.handleEvent(event)
+        elif self.paused:
             self.pauseScreen.handleEvent(event)
         else:
             self.inputHandler.handleEvent(event)
@@ -107,6 +122,10 @@ class Game:
     def update(self, delta):
         if self.player is not None:
             self.pauseUI.update(delta)
+
+        if self.won:
+            self.winScreen.update(delta)
+            return
 
         if self.paused:
             self.pauseScreen.update(delta)
@@ -123,6 +142,10 @@ class Game:
 
         if self.player is None:
             self.gameOverScreen.update(delta)
+
+        if self.player is not None and self.totalCoins > 0 and self._countCoins(self.objects) == 0:
+            self.won = True
+            self.winScreen.show()
 
         if self.player is not None:
             self.camera.follow(self.player)
@@ -143,5 +166,7 @@ class Game:
         if self.player is not None:
             self.pauseUI.draw(canvas)
 
-            if self.paused:
+            if self.won:
+                self.winScreen.draw(canvas)
+            elif self.paused:
                 self.pauseScreen.draw(canvas)
