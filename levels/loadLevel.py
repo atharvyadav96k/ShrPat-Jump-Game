@@ -1,8 +1,17 @@
-from objects import Rectangle
+import os
+import pygame
+from objects import Rectangle, TiledImage
 from gameobjects import Ground, Boxes
 from .map import map as levelMap
 
 TILE_SIZE = 50
+GROUND_TOP_INSET = 10
+GRASS_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "ground", "grass")
+
+
+def _loadGrassTiles():
+    files = sorted(os.listdir(GRASS_DIR), key=lambda f: int(os.path.splitext(f)[0]))
+    return [pygame.image.load(os.path.join(GRASS_DIR, f)).convert_alpha() for f in files]
 
 
 def getLevelSize():
@@ -31,6 +40,7 @@ def _mergeRuns(cells):
 
 
 def loadLevel(color=(255, 255, 255)):
+    grassTiles = _loadGrassTiles()
     grounds = []
 
     for row, cells in enumerate(levelMap):
@@ -40,7 +50,10 @@ def loadLevel(color=(255, 255, 255)):
             width = length * TILE_SIZE
 
             if cell == '_':
-                grounds.append(Ground(Rectangle(f"ground_{row}_{startCol}", [x, y], [width, TILE_SIZE], color)))
+                gameObject = TiledImage(f"ground_{row}_{startCol}", [x, y], [width, TILE_SIZE], grassTiles, TILE_SIZE)
+                ground = Ground(gameObject)
+                ground.setHitbox(offset=(0, GROUND_TOP_INSET), size=(width, TILE_SIZE - GROUND_TOP_INSET))
+                grounds.append(ground)
             elif cell == '*':
                 grounds.append(Boxes(Rectangle(f"box_{row}_{startCol}", [x, y], [width, TILE_SIZE], (0, 0, 255))))
 

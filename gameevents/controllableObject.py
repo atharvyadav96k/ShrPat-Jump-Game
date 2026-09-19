@@ -2,7 +2,7 @@ import math
 
 
 class ControllableObject:
-    def __init__(self, gameObject, bindings=None, speedBindings=None, collidable=False, rigid=False, gravity=False, gravityAccel=900, friction=0, zIndex=0):
+    def __init__(self, gameObject, bindings=None, speedBindings=None, collidable=False, rigid=False, gravity=False, gravityAccel=900, friction=0, zIndex=0, hitboxOffset=(0, 0), hitboxSize=None):
         self.gameObject = gameObject
         self.bindings = dict(bindings) if bindings else {}
         self.speedBindings = dict(speedBindings) if speedBindings else {}
@@ -13,11 +13,13 @@ class ControllableObject:
         self.activeSpeedKey = None
         self.collidable = collidable
         self.rigid = rigid
-        self.previousBounds = gameObject.getBounds()
         self.gravity = gravity
         self.gravityAccel = gravityAccel
         self.friction = friction
         self.zIndex = zIndex
+        self.hitboxOffset = hitboxOffset
+        self.hitboxSize = hitboxSize
+        self.previousBounds = self.getBounds()
 
     def enableCollision(self):
         self.collidable = True
@@ -36,7 +38,14 @@ class ControllableObject:
         self.friction = friction
 
     def getBounds(self):
-        return self.gameObject.getBounds()
+        x, y, w, h = self.gameObject.getBounds()
+        offsetX, offsetY = self.hitboxOffset
+        hitboxW, hitboxH = self.hitboxSize if self.hitboxSize is not None else (w, h)
+        return (x + offsetX, y + offsetY, hitboxW, hitboxH)
+
+    def setHitbox(self, offset=(0, 0), size=None):
+        self.hitboxOffset = offset
+        self.hitboxSize = size
 
     def onCollision(self, other):
         if self.rigid:
@@ -45,17 +54,18 @@ class ControllableObject:
         x, y, w, h = self.getBounds()
         ox, oy, ow, oh = other.getBounds()
         prevX, prevY, _, _ = self.previousBounds
+        offsetX, offsetY = self.hitboxOffset
 
         overlapX = min(x + w, ox + ow) - max(x, ox)
         overlapY = min(y + h, oy + oh) - max(y, oy)
 
         if overlapX < overlapY:
-            self.gameObject.setPosition(prevX, y)
+            self.gameObject.setPosition(prevX - offsetX, y - offsetY)
             self.vx = 0
             if abs(math.cos(math.radians(self.angle))) > 1e-9:
                 self.speed = 0
         else:
-            self.gameObject.setPosition(x, prevY)
+            self.gameObject.setPosition(x - offsetX, prevY - offsetY)
             self.vy = 0
             if abs(math.sin(math.radians(self.angle))) > 1e-9:
                 self.speed = 0
@@ -100,7 +110,7 @@ class ControllableObject:
         self.gameObject.drawObject(canvas, offset)
 
     def update(self, delta):
-        self.previousBounds = self.gameObject.getBounds()
+        self.previousBounds = self.getBounds()
 
         if self.gravity:
             self.applyForce(90, self.gravityAccel * delta)
