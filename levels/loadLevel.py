@@ -6,6 +6,7 @@ from .map import map as levelMap
 
 TILE_SIZE = 50
 GROUND_TOP_INSET = 10
+GROUND_Z_INDEX = 4
 GRASS_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "ground", "grass")
 
 
@@ -51,7 +52,7 @@ def loadLevel(color=(255, 255, 255)):
 
             if cell == '_':
                 gameObject = TiledImage(f"ground_{row}_{startCol}", [x, y], [width, TILE_SIZE], grassTiles, TILE_SIZE)
-                ground = Ground(gameObject)
+                ground = Ground(gameObject, zIndex=GROUND_Z_INDEX)
                 ground.setHitbox(offset=(0, GROUND_TOP_INSET), size=(width, TILE_SIZE - GROUND_TOP_INSET))
                 grounds.append(ground)
             elif cell == '*':
