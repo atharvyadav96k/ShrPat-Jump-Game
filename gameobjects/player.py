@@ -5,7 +5,7 @@ from gameevents.controllableObject import ControllableObject
 
 
 class Player(ControllableObject):
-    def __init__(self, gameObject, walkSpeed=200, jumpForce=400, maxAirJumps=3, airJumpRefillTime=5,
+    def __init__(self, gameObject, walkSpeed=200, jumpForce=400, maxAirJumps=2, airJumpRefillTime=5,
                  gravityAccel=900, friction=0, zIndex=1):
         super().__init__(gameObject, collidable=True, gravity=True, gravityAccel=gravityAccel, friction=friction, zIndex=zIndex)
         self.jumpForce = jumpForce
@@ -141,7 +141,11 @@ class Player(ControllableObject):
         if not anim or not frames:
             return
 
-        if not anim["loop"] and self.animIndex >= len(frames) - 1:
+        maxIndex = len(frames) - 1
+        if state == "fall" and not anim["loop"] and len(frames) > 1:
+            maxIndex = len(frames) - 2
+
+        if not anim["loop"] and self.animIndex >= maxIndex:
             return
 
         self.animTimer += delta
@@ -153,7 +157,7 @@ class Player(ControllableObject):
         if anim["loop"]:
             self.animIndex = (self.animIndex + 1) % len(frames)
         else:
-            self.animIndex = min(self.animIndex + 1, len(frames) - 1)
+            self.animIndex = min(self.animIndex + 1, maxIndex)
 
         self.gameObject.setImage(frames[self.animIndex])
 
@@ -191,9 +195,21 @@ class Player(ControllableObject):
 
     def onCollision(self, other):
         wasFalling = self.vy > 0
+        wasInFallAnim = self.animState == "fall"
         super().onCollision(other)
 
         if wasFalling and self.vy == 0:
+            if wasInFallAnim:
+                self._showFallLandingFrame()
             self.grounded = True
             self.groundY = self.getBounds()[1]
             self.refillAirJumps()
+
+    def _showFallLandingFrame(self):
+        frames = self._framesFor("fall")
+        if not frames:
+            return
+
+        self.animState = "fall"
+        self.animIndex = len(frames) - 1
+        self.gameObject.setImage(frames[self.animIndex])
