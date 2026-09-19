@@ -1,5 +1,5 @@
 import pygame
-from .controllableObject import ControllableObject
+from gameevents.controllableObject import ControllableObject
 
 
 class Player(ControllableObject):

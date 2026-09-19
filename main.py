@@ -2,7 +2,8 @@ import pygame
 from time import time
 from objects import Rectangle
 from renderer import Renderer, HUD
-from gameevents import ControllableObject, Player, Obstacle, InputHandler, CollisionSystem
+from gameevents import ControllableObject, Obstacle, InputHandler, CollisionSystem
+from gameobjects import Player
 
 pygame.init()
 
