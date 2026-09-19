@@ -2,7 +2,7 @@ import math
 
 
 class ControllableObject:
-    def __init__(self, gameObject, bindings=None, speedBindings=None, collidable=False, rigid=False, gravity=False, gravityAccel=900, friction=0):
+    def __init__(self, gameObject, bindings=None, speedBindings=None, collidable=False, rigid=False, gravity=False, gravityAccel=900, friction=0, zIndex=0):
         self.gameObject = gameObject
         self.bindings = dict(bindings) if bindings else {}
         self.speedBindings = dict(speedBindings) if speedBindings else {}
@@ -17,6 +17,7 @@ class ControllableObject:
         self.gravity = gravity
         self.gravityAccel = gravityAccel
         self.friction = friction
+        self.zIndex = zIndex
 
     def enableCollision(self):
         self.collidable = True

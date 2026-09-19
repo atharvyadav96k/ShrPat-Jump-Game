@@ -4,8 +4,8 @@ from gameevents.controllableObject import ControllableObject
 
 class Player(ControllableObject):
     def __init__(self, gameObject, walkSpeed=200, jumpForce=400, maxAirJumps=3, airJumpRefillTime=5,
-                 gravityAccel=900, friction=0):
-        super().__init__(gameObject, collidable=True, gravity=True, gravityAccel=gravityAccel, friction=friction)
+                 gravityAccel=900, friction=0, zIndex=1):
+        super().__init__(gameObject, collidable=True, gravity=True, gravityAccel=gravityAccel, friction=friction, zIndex=zIndex)
         self.jumpForce = jumpForce
         self.grounded = False
 

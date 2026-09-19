@@ -5,5 +5,7 @@ class Renderer:
 
     def render(self, objects, delta):
         for object in objects:
-            object.drawObject(self.canvas)
             object.update(delta)
+
+        for object in sorted(objects, key=lambda o: o.zIndex):
+            object.drawObject(self.canvas)
