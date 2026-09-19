@@ -2,37 +2,29 @@ import pygame
 from time import time
 from objects import Rectangle
 from renderer import Renderer, HUD
-from gameevents import ControllableObject, Obstacle, InputHandler, CollisionSystem
+from gameevents import Obstacle, InputHandler, CollisionSystem
 from gameobjects import Player
+from levels import loadLevel
 
 pygame.init()
 
-canvas = pygame.display.set_mode((1200, 720))
+SCREEN_WIDTH = 1200
+SCREEN_HEIGHT = 720
+
+canvas = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("My Board")
 
 
-player = Player(Rectangle("player", [100, 0], [50, 100], (255, 255, 255)))
+player = Player(Rectangle("player", [100, 0], [20, 70], (255, 255, 255)))
 
-ground1 = ControllableObject(
-    Rectangle("background", [0, 201], [900, 100], (255, 255, 255)),
-    collidable=True,
-    rigid=True,
-)
-
-ground2 = ControllableObject(
-    Rectangle("background", [300, 501], [900, 100], (255, 255, 255)),
-    collidable=True,
-    rigid=True,
-)
-
-opstical = Obstacle(Rectangle("wall", [400, 150], [50, 50], (255, 0, 0)))
+grounds = loadLevel(SCREEN_WIDTH, SCREEN_HEIGHT)
 
 class Game():
     def __init__(self):
         self.exit = False
         self.renderer = Renderer(canvas)
         self.hud = HUD(canvas, player)
-        self.objects = [player, ground1, ground2, opstical]
+        self.objects = [player, *grounds]
         self.inputHandler = InputHandler(self.objects)
         self.collisionSystem = CollisionSystem(self.objects)
 
