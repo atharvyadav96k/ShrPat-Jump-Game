@@ -1,7 +1,6 @@
 import os
 import pygame
 from time import time
-from objects import Image
 from renderer import Renderer, HUD, Camera, easing
 from gameevents import Obstacle, InputHandler, CollisionSystem
 from gameobjects import Player
@@ -20,13 +19,8 @@ canvas = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("My Board")
 
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets", "female-character")
-playerFrames = [
-    pygame.image.load(os.path.join(ASSETS_DIR, f"{i}.png")).convert_alpha()
-    for i in range(1, 8)
-]
 
-player = Player(Image("player", [100, 0], PLAYER_SIZE, playerFrames[0]))
-player.setAnimation(playerFrames, frameDuration=0.08)
+player = Player.fromAssets(ASSETS_DIR, [100, 0], PLAYER_SIZE)
 
 grounds = loadLevel()
 LEVEL_WIDTH, LEVEL_HEIGHT = getLevelSize()

@@ -1,4 +1,6 @@
+import os
 import pygame
+from objects import Image
 from gameevents.controllableObject import ControllableObject
 
 
@@ -17,11 +19,11 @@ class Player(ControllableObject):
         self.airJumpTimer = 0
         self.facing = 0
 
-        self.animationFrames = None
-        self.animationFramesFlipped = None
-        self.animationFrameDuration = 0.08
-        self.animationIndex = 0
-        self.animationTimer = 0
+        self.animations = {}
+        self.animState = "idle"
+        self.animIndex = 0
+        self.animTimer = 0
+        self.airborneVelocityThreshold = 100
 
         self.bindSpeedKey(pygame.K_LEFT, 180, walkSpeed)
         self.bindSpeedKey(pygame.K_RIGHT, 0, walkSpeed)
@@ -48,33 +50,104 @@ class Player(ControllableObject):
         self.airJumpsRemaining = self.maxAirJumps
         self.airJumpLocked = False
 
+    @classmethod
+    def fromAssets(cls, assetsDir, position, size, **kwargs):
+        idleFrame = pygame.image.load(os.path.join(assetsDir, "0.png")).convert_alpha()
+        walkFrames = [
+            pygame.image.load(os.path.join(assetsDir, f"{i}.png")).convert_alpha()
+            for i in range(1, 8)
+        ]
+        jumpFrames = cls._loadFrameSequence(os.path.join(assetsDir, "jump"))
+        fallFrames = cls._loadFrameSequence(os.path.join(assetsDir, "falling"))
+
+        player = cls(Image("player", position, size, idleFrame), **kwargs)
+        player.setAnimation("idle", [idleFrame], loop=True)
+        player.setAnimation("walk", walkFrames, frameDuration=0.08, loop=True)
+        player.setAnimation("jump", jumpFrames, frameDuration=0.08, loop=False)
+        player.setAnimation("fall", fallFrames, frameDuration=0.08, loop=False)
+        return player
+
+    @staticmethod
+    def _loadFrameSequence(dirPath):
+        files = sorted(os.listdir(dirPath), key=lambda f: int(os.path.splitext(f)[0]))
+        return [pygame.image.load(os.path.join(dirPath, f)).convert_alpha() for f in files]
+
     def heightAboveGround(self):
         return max(0, self.groundY - self.getBounds()[1])
 
-    def setAnimation(self, frames, frameDuration=0.1):
-        self.animationFrames = frames
-        self.animationFramesFlipped = [pygame.transform.flip(frame, True, False) for frame in frames]
-        self.animationFrameDuration = frameDuration
-        self.animationIndex = 0
-        self.animationTimer = 0
+    def isWalking(self):
+        return self.speed != 0
 
+    def setAnimation(self, name, frames, frameDuration=0.1, loop=True):
+        self.animations[name] = {
+            "frames": frames,
+            "flipped": [pygame.transform.flip(frame, True, False) for frame in frames],
+            "duration": frameDuration,
+            "loop": loop,
+        }
+
+        if name == self.animState:
+            self.animIndex = 0
+            self.animTimer = 0
+            self._applyCurrentFrame()
+
+    def _framesFor(self, name):
+        anim = self.animations.get(name)
+        if not anim:
+            return None
+
+        return anim["flipped"] if self.facing == 180 else anim["frames"]
+
+    def _applyCurrentFrame(self):
+        frames = self._framesFor(self.animState)
         if frames and hasattr(self.gameObject, "setImage"):
-            self.gameObject.setImage(self._currentFrames()[0])
+            self.gameObject.setImage(frames[min(self.animIndex, len(frames) - 1)])
 
-    def _currentFrames(self):
-        return self.animationFramesFlipped if self.facing == 180 else self.animationFrames
+    def _determineState(self, grounded):
+        if grounded:
+            return "walk" if self.isWalking() else "idle"
 
-    def _advanceAnimation(self, delta):
-        if not self.animationFrames:
+        if self.vy < -self.airborneVelocityThreshold:
+            return "jump"
+
+        if self.vy > self.airborneVelocityThreshold:
+            return "fall"
+
+        if self.animState in ("jump", "fall"):
+            return self.animState
+
+        return "walk" if self.isWalking() else "idle"
+
+    def _advanceAnimation(self, delta, grounded):
+        state = self._determineState(grounded)
+
+        if state != self.animState:
+            self.animState = state
+            self.animIndex = 0
+            self.animTimer = 0
+            self._applyCurrentFrame()
             return
 
-        self.animationTimer += delta
-        if self.animationTimer < self.animationFrameDuration:
+        anim = self.animations.get(state)
+        frames = self._framesFor(state)
+        if not anim or not frames:
             return
 
-        self.animationTimer -= self.animationFrameDuration
-        self.animationIndex = (self.animationIndex + 1) % len(self.animationFrames)
-        self.gameObject.setImage(self._currentFrames()[self.animationIndex])
+        if not anim["loop"] and self.animIndex >= len(frames) - 1:
+            return
+
+        self.animTimer += delta
+        if self.animTimer < anim["duration"]:
+            return
+
+        self.animTimer -= anim["duration"]
+
+        if anim["loop"]:
+            self.animIndex = (self.animIndex + 1) % len(frames)
+        else:
+            self.animIndex = min(self.animIndex + 1, len(frames) - 1)
+
+        self.gameObject.setImage(frames[self.animIndex])
 
     def handleKeyDown(self, key):
         if key == pygame.K_UP:
@@ -93,11 +166,10 @@ class Player(ControllableObject):
             return
 
         self.facing = angle
-
-        if self.animationFrames:
-            self.gameObject.setImage(self._currentFrames()[self.animationIndex])
+        self._applyCurrentFrame()
 
     def update(self, delta):
+        wasGrounded = self.grounded
         self.grounded = False
 
         if self.airJumpLocked:
@@ -105,7 +177,7 @@ class Player(ControllableObject):
             if self.airJumpTimer >= self.airJumpRefillTime:
                 self.refillAirJumps()
 
-        self._advanceAnimation(delta)
+        self._advanceAnimation(delta, wasGrounded)
 
         super().update(delta)
 
