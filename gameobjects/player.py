@@ -7,6 +7,7 @@ from gameevents.controllableObject import ControllableObject
 
 class Player(ControllableObject):
     _frameCache = {}
+    MAX_AIR_JUMPS_CAP = 3
 
     def __init__(self, gameObject, walkSpeed=200, jumpForce=400, maxAirJumps=1, airJumpRefillTime=5,
                  gravityAccel=900, friction=0, zIndex=1, maxHealth=100):
@@ -17,6 +18,7 @@ class Player(ControllableObject):
         self.grounded = False
         self.groundY = gameObject.getBounds()[1]
 
+        self.baseMaxAirJumps = maxAirJumps
         self.maxAirJumps = maxAirJumps
         self.airJumpsRemaining = maxAirJumps
         self.airJumpRefillTime = airJumpRefillTime
@@ -52,15 +54,16 @@ class Player(ControllableObject):
         if self.airJumpsRemaining <= 0:
             self.airJumpLocked = True
             self.airJumpTimer = 0
+            self.maxAirJumps = self.baseMaxAirJumps
 
     def refillAirJumps(self):
         self.airJumpsRemaining = self.maxAirJumps
         self.airJumpLocked = False
 
     def grantExtraJump(self, amount=1):
-        self.airJumpsRemaining = min(self.maxAirJumps, self.airJumpsRemaining + amount)
-        if self.airJumpsRemaining > 0:
-            self.airJumpLocked = False
+        self.maxAirJumps = min(self.MAX_AIR_JUMPS_CAP, self.maxAirJumps + amount)
+        self.airJumpsRemaining = self.maxAirJumps
+        self.airJumpLocked = False
 
     def addScore(self, amount):
         self.score += amount
