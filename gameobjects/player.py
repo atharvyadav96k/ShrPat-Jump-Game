@@ -33,6 +33,7 @@ class Player(ControllableObject):
             self.vy = 0
             self.applyForce(270, self.jumpForce)
             self.grounded = False
+            self._restartAnimation("jump")
             return
 
         if self.airJumpsRemaining <= 0 or self.airJumpLocked:
@@ -41,6 +42,7 @@ class Player(ControllableObject):
         self.vy = 0
         self.applyForce(270, self.jumpForce)
         self.airJumpsRemaining -= 1
+        self._restartAnimation("jump")
 
         if self.airJumpsRemaining <= 0:
             self.airJumpLocked = True
@@ -62,7 +64,7 @@ class Player(ControllableObject):
 
         player = cls(Image("player", position, size, idleFrame), **kwargs)
         player.setAnimation("idle", [idleFrame], loop=True)
-        player.setAnimation("walk", walkFrames, frameDuration=0.08, loop=True)
+        player.setAnimation("walk", walkFrames, frameDuration=0.04, loop=True)
         player.setAnimation("jump", jumpFrames, frameDuration=0.08, loop=False)
         player.setAnimation("fall", fallFrames, frameDuration=0.08, loop=False)
         return player
@@ -90,6 +92,12 @@ class Player(ControllableObject):
             self.animIndex = 0
             self.animTimer = 0
             self._applyCurrentFrame()
+
+    def _restartAnimation(self, name):
+        self.animState = name
+        self.animIndex = 0
+        self.animTimer = 0
+        self._applyCurrentFrame()
 
     def _framesFor(self, name):
         anim = self.animations.get(name)
