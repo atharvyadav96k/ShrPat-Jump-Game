@@ -14,19 +14,18 @@ player = ControllableObject(
     Rectangle("player", [100, 0], [50, 100], (255, 255, 255)),
     bindings={
         pygame.K_UP: (270, 400),
-        pygame.K_RIGHT: (180, 150),
-        pygame.K_LEFT: (0, 150),
+    },
+    speedBindings={
+        pygame.K_RIGHT: (0, 200),
+        pygame.K_LEFT: (180, 200),
     },
     collidable=True,
     gravity=True,
+    friction=300,
 )
 
 ground = ControllableObject(
     Rectangle("background", [0, 201], [1200, 100], (255, 255, 255)),
-    bindings={
-        pygame.K_RIGHT: (180, 150),
-        pygame.K_LEFT: (0, 150),
-    },
     collidable=True,
     rigid=True,
 )

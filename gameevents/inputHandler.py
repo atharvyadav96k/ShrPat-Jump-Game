@@ -9,3 +9,6 @@ class InputHandler:
         if event.type == pygame.KEYDOWN:
             for controllable in self.controllables:
                 controllable.handleKeyDown(event.key)
+        elif event.type == pygame.KEYUP:
+            for controllable in self.controllables:
+                controllable.handleKeyUp(event.key)
