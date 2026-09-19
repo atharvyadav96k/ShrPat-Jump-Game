@@ -17,11 +17,11 @@ player = ControllableObject(
     },
     speedBindings={
         pygame.K_RIGHT: (0, 200),
-        pygame.K_LEFT: (180, 200),
+        pygame.K_LEFT: (180, 400),
     },
     collidable=True,
     gravity=True,
-    friction=300,
+    friction=200,
 )
 
 ground = ControllableObject(

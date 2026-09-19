@@ -41,11 +41,23 @@ class ControllableObject:
         if self.rigid:
             return
 
-        x, y, _, _ = self.previousBounds
-        self.gameObject.setPosition(x, y)
-        self.vx = 0
-        self.vy = 0
-        self.speed = 0
+        x, y, w, h = self.getBounds()
+        ox, oy, ow, oh = other.getBounds()
+        prevX, prevY, _, _ = self.previousBounds
+
+        overlapX = min(x + w, ox + ow) - max(x, ox)
+        overlapY = min(y + h, oy + oh) - max(y, oy)
+
+        if overlapX < overlapY:
+            self.gameObject.setPosition(prevX, y)
+            self.vx = 0
+            if abs(math.cos(math.radians(self.angle))) > 1e-9:
+                self.speed = 0
+        else:
+            self.gameObject.setPosition(x, prevY)
+            self.vy = 0
+            if abs(math.sin(math.radians(self.angle))) > 1e-9:
+                self.speed = 0
 
     def bindKey(self, key, angle, force):
         self.bindings[key] = (angle, force)
