@@ -2,7 +2,7 @@ import pygame
 from time import time
 from objects import Rectangle
 from renderer import Renderer
-from gameevents import ControllableObject, InputHandler, CollisionSystem
+from gameevents import ControllableObject, Player, Obstacle, InputHandler, CollisionSystem
 
 pygame.init()
 
@@ -10,19 +10,7 @@ canvas = pygame.display.set_mode((1200, 720))
 pygame.display.set_caption("My Board")
 
 
-player = ControllableObject(
-    Rectangle("player", [100, 0], [50, 100], (255, 255, 255)),
-    bindings={
-        pygame.K_UP: (270, 400),
-    },
-    speedBindings={
-        pygame.K_RIGHT: (0, 200),
-        pygame.K_LEFT: (180, 200),
-    },
-    collidable=True,
-    gravity=True,
-    friction=0,
-)
+player = Player(Rectangle("player", [100, 0], [50, 100], (255, 255, 255)))
 
 ground1 = ControllableObject(
     Rectangle("background", [0, 201], [900, 100], (255, 255, 255)),
@@ -36,10 +24,7 @@ ground2 = ControllableObject(
     rigid=True,
 )
 
-opstical = ControllableObject(
-    Rectangle("wall", [400, 150], [50, 50], (255, 0, 0)),
-    collidable=True
-)
+opstical = Obstacle(Rectangle("wall", [400, 150], [50, 50], (255, 0, 0)))
 
 class Game():
     def __init__(self):
