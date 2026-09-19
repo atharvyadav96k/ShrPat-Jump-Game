@@ -63,13 +63,13 @@ def loadLevel(levelMap=None):
             elif cell == '$':
                 grounds.append(WoodBox.fromRect([x, y], [width, TILE_SIZE]))
             elif cell == '!':
-                grounds.append(KillObstacle.fromRect([x, y], [width, TILE_SIZE]))
+                grounds.append(KillObstacle.fromAssets([x, y], [width, TILE_SIZE]))
             elif cell == 'H':
-                grounds.append(HorizontalMovingKillObstacle.fromRect(
+                grounds.append(HorizontalMovingKillObstacle.fromAssets(
                     [x, y], [width, TILE_SIZE], travelDistance=TILE_SIZE * MOVING_KILL_TRAVEL_TILES, speed=MOVING_KILL_SPEED
                 ))
             elif cell == 'V':
-                grounds.append(VerticalMovingKillObstacle.fromRect(
+                grounds.append(VerticalMovingKillObstacle.fromAssets(
                     [x, y], [width, TILE_SIZE], travelDistance=TILE_SIZE * MOVING_KILL_TRAVEL_TILES, speed=MOVING_KILL_SPEED
                 ))
 
