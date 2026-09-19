@@ -22,6 +22,7 @@ class Player(ControllableObject):
 
     def jump(self):
         if self.grounded:
+            self.vy = 0
             self.applyForce(270, self.jumpForce)
             self.grounded = False
             return
@@ -29,6 +30,7 @@ class Player(ControllableObject):
         if self.airJumpsRemaining <= 0 or self.airJumpLocked:
             return
 
+        self.vy = 0
         self.applyForce(270, self.jumpForce)
         self.airJumpsRemaining -= 1
 
