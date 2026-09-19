@@ -1,6 +1,6 @@
 import os
 import pygame
-from objects import Rectangle, Image
+from objects import Rectangle, TiledAnimatedImage
 from animation import Animator
 from gameevents.controllableObject import ControllableObject
 
@@ -34,7 +34,7 @@ class KillObstacle(ControllableObject):
     @classmethod
     def fromAssets(cls, position, size, frameDuration=LAVA_FRAME_DURATION):
         frames = _loadLavaFrames()
-        gameObject = Image(f"kill_{position[0]}_{position[1]}", position, size, frames[0])
+        gameObject = TiledAnimatedImage(f"kill_{position[0]}_{position[1]}", position, size, frames[0], tileSize=size[1])
         obstacle = cls(gameObject)
         obstacle.animator = Animator(gameObject)
         obstacle.animator.add("idle", frames, frameDuration=frameDuration, loop=True)
