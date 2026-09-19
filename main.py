@@ -17,6 +17,7 @@ player = ControllableObject(
         pygame.K_DOWN: (90, 100),
     },
     collidable=True,
+    gravity=True,
 )
 
 ground = ControllableObject(
