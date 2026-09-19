@@ -44,7 +44,7 @@ def loadLevel():
     grassTiles = _loadGrassTiles()
     grounds = []
 
-    for row, cells in enumerate(levelMap):
+    for row, cells in enumerate(levelMap[:-1]):
         for cell, startCol, length in _mergeRuns(cells):
             x = startCol * TILE_SIZE
             y = row * TILE_SIZE
