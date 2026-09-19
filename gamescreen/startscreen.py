@@ -7,7 +7,8 @@ PLAY_BUTTON_FRAMES_DIR = os.path.join(os.path.dirname(__file__), "..", "assets",
 
 
 def _loadFrameSequence(dirPath):
-    files = sorted(os.listdir(dirPath), key=lambda f: int(os.path.splitext(f)[0]))
+    entries = [f for f in os.listdir(dirPath) if os.path.splitext(f)[0].isdigit()]
+    files = sorted(entries, key=lambda f: int(os.path.splitext(f)[0]))
     return [pygame.image.load(os.path.join(dirPath, f)).convert_alpha() for f in files]
 
 

@@ -1,4 +1,4 @@
-from .map1 import MAP as MAP_1
+from .map1 import map as MAP_1
 from .map2 import MAP as MAP_2
 from .map3 import MAP as MAP_3
 from .map4 import MAP as MAP_4

@@ -11,7 +11,8 @@ GRASS_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "ground", "g
 
 
 def _loadGrassTiles():
-    files = sorted(os.listdir(GRASS_DIR), key=lambda f: int(os.path.splitext(f)[0]))
+    entries = [f for f in os.listdir(GRASS_DIR) if os.path.splitext(f)[0].isdigit()]
+    files = sorted(entries, key=lambda f: int(os.path.splitext(f)[0]))
     return [pygame.image.load(os.path.join(GRASS_DIR, f)).convert_alpha() for f in files]
 
 
