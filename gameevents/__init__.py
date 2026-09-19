@@ -1,4 +1,2 @@
-from .objectMoveEvent import ObjectMove
-from .objectEventList import ObjectEventList
-from .keyBindings import KeyBindingRegistry
+from .controllableObject import ControllableObject
 from .inputHandler import InputHandler
