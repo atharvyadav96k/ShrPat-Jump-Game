@@ -4,3 +4,4 @@ from .boxes import Boxes
 from .woodBox import WoodBox
 from .damageObstacle import DamageObstacle
 from .killObstacle import KillObstacle
+from .movingKillObstacle import HorizontalMovingKillObstacle, VerticalMovingKillObstacle

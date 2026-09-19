@@ -1,13 +1,15 @@
 import os
 import pygame
 from objects import TiledImage
-from gameobjects import Ground, WoodBox, KillObstacle
+from gameobjects import Ground, WoodBox, KillObstacle, HorizontalMovingKillObstacle, VerticalMovingKillObstacle
 from .map import map as DEFAULT_MAP
 
 TILE_SIZE = 50
 GROUND_TOP_INSET = 10
 GROUND_Z_INDEX = 4
 GRASS_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "ground", "grass")
+MOVING_KILL_TRAVEL_TILES = 4
+MOVING_KILL_SPEED = 100
 
 
 def _loadGrassTiles():
@@ -29,7 +31,7 @@ def _mergeRuns(cells):
 
     while col < len(cells):
         cell = cells[col]
-        if cell not in ('_', '$', '!'):
+        if cell not in ('_', '$', '!', 'H', 'V'):
             col += 1
             continue
 
@@ -62,5 +64,13 @@ def loadLevel(levelMap=None):
                 grounds.append(WoodBox.fromRect([x, y], [width, TILE_SIZE]))
             elif cell == '!':
                 grounds.append(KillObstacle.fromRect([x, y], [width, TILE_SIZE]))
+            elif cell == 'H':
+                grounds.append(HorizontalMovingKillObstacle.fromRect(
+                    [x, y], [width, TILE_SIZE], travelDistance=TILE_SIZE * MOVING_KILL_TRAVEL_TILES, speed=MOVING_KILL_SPEED
+                ))
+            elif cell == 'V':
+                grounds.append(VerticalMovingKillObstacle.fromRect(
+                    [x, y], [width, TILE_SIZE], travelDistance=TILE_SIZE * MOVING_KILL_TRAVEL_TILES, speed=MOVING_KILL_SPEED
+                ))
 
     return grounds
