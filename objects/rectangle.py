@@ -1,5 +1,4 @@
 import pygame
-import math
 from .object import Object
 
 
@@ -24,12 +23,7 @@ class Rectangle(Object):
         self.rectCords[0] = x
         self.rectCords[1] = y
 
-    def moveObject(self, directionAngle, directionSpeed, delta):
-        angle = math.radians(directionAngle)
-
-        dx = math.cos(angle) * directionSpeed * delta
-        dy = math.sin(angle) * directionSpeed * delta
-
+    def translate(self, dx, dy):
         self.rectCords[0] += dx
         self.rectCords[1] += dy
 

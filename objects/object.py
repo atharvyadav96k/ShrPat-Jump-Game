@@ -9,7 +9,7 @@ class Object(ABC):
     def getObjName(self):
         pass
     @abstractmethod
-    def moveObject(self, directionAngle, directionSpeed):
+    def translate(self, dx, dy):
         pass
 
     @abstractmethod
