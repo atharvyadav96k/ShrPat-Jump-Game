@@ -6,6 +6,8 @@ from gameevents.controllableObject import ControllableObject
 
 
 class Player(ControllableObject):
+    _frameCache = {}
+
     def __init__(self, gameObject, walkSpeed=200, jumpForce=400, maxAirJumps=1, airJumpRefillTime=5,
                  gravityAccel=900, friction=0, zIndex=1, maxHealth=100):
         super().__init__(gameObject, collidable=True, gravity=True, gravityAccel=gravityAccel, friction=friction, zIndex=zIndex)
@@ -70,23 +72,34 @@ class Player(ControllableObject):
 
     @classmethod
     def fromAssets(cls, assetsDir, position, size, **kwargs):
-        idleFrame = pygame.image.load(os.path.join(assetsDir, "0.png")).convert_alpha()
-        walkFrames = [
-            pygame.image.load(os.path.join(assetsDir, f"{i}.png")).convert_alpha()
-            for i in range(1, 8)
-        ]
-        jumpFrames = cls._loadFrameSequence(os.path.join(assetsDir, "jump"))
-        fallFrames = cls._loadFrameSequence(os.path.join(assetsDir, "falling"))
-        dieFrames = cls._loadFrameSequence(os.path.join(assetsDir, "die"))
+        frames = cls._getFrames(assetsDir)
 
-        player = cls(Image("player", position, size, idleFrame), **kwargs)
-        player.animator.add("idle", [idleFrame], loop=True)
-        player.animator.add("walk", walkFrames, frameDuration=0.04, loop=True)
-        player.animator.add("jump", jumpFrames, frameDuration=0.08, loop=False)
-        player.animator.add("fall", fallFrames, frameDuration=0.08, loop=False, waitForTrigger=True)
-        player.animator.add("die", dieFrames, frameDuration=0.1, loop=False)
+        player = cls(Image("player", position, size, frames["idle"][0]), **kwargs)
+        player.animator.add("idle", frames["idle"], loop=True)
+        player.animator.add("walk", frames["walk"], frameDuration=0.04, loop=True)
+        player.animator.add("jump", frames["jump"], frameDuration=0.08, loop=False)
+        player.animator.add("fall", frames["fall"], frameDuration=0.08, loop=False, waitForTrigger=True)
+        player.animator.add("die", frames["die"], frameDuration=0.1, loop=False)
         player.animator.setState("idle")
         return player
+
+    @classmethod
+    def _getFrames(cls, assetsDir):
+        if assetsDir not in cls._frameCache:
+            idleFrame = pygame.image.load(os.path.join(assetsDir, "0.png")).convert_alpha()
+            walkFrames = [
+                pygame.image.load(os.path.join(assetsDir, f"{i}.png")).convert_alpha()
+                for i in range(1, 8)
+            ]
+            cls._frameCache[assetsDir] = {
+                "idle": [idleFrame],
+                "walk": walkFrames,
+                "jump": cls._loadFrameSequence(os.path.join(assetsDir, "jump")),
+                "fall": cls._loadFrameSequence(os.path.join(assetsDir, "falling")),
+                "die": cls._loadFrameSequence(os.path.join(assetsDir, "die")),
+            }
+
+        return cls._frameCache[assetsDir]
 
     @staticmethod
     def _loadFrameSequence(dirPath):

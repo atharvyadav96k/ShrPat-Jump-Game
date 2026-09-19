@@ -5,6 +5,7 @@ from renderer import Renderer, HUD, Camera, Background, easing
 from gameevents import Obstacle, InputHandler, CollisionSystem
 from gameobjects import Player
 from levels import loadLevel, getLevelSize
+from gamescreen import GameOverScreen
 
 pygame.init()
 
@@ -14,6 +15,7 @@ EDGE_ZOOM_MARGIN = 80
 ZOOM_DURATION = 0.4
 ZOOM_EASING = easing.easeOutQuad
 PLAYER_SIZE = [42, 70]
+PLAYER_START = [100, 0]
 CAMERA_ZOOM = 1.2
 EDGE_ZOOM_OUT_FACTOR = 0.6
 MIN_ZOOM = CAMERA_ZOOM * EDGE_ZOOM_OUT_FACTOR
@@ -25,7 +27,6 @@ ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets", "female-character
 BG_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "assets", "bg.png")
 BACKGROUND_PARALLAX = 0.8
 
-player = Player.fromAssets(ASSETS_DIR, [100, 0], PLAYER_SIZE)
 background = Background(
     pygame.image.load(BG_IMAGE_PATH).convert(),
     parallaxFactor=BACKGROUND_PARALLAX,
@@ -39,13 +40,15 @@ LEVEL_WIDTH, LEVEL_HEIGHT = getLevelSize()
 class Game():
     def __init__(self):
         self.exit = False
+        self.player = Player.fromAssets(ASSETS_DIR, PLAYER_START, PLAYER_SIZE)
         self.renderer = Renderer(canvas)
-        self.hud = HUD(canvas, player)
+        self.hud = HUD(canvas, self.player)
         self.camera = Camera(SCREEN_WIDTH, SCREEN_HEIGHT, LEVEL_WIDTH, LEVEL_HEIGHT)
-        self.objects = [player, *grounds]
+        self.objects = [self.player, *grounds]
         self.inputHandler = InputHandler(self.objects)
         self.collisionSystem = CollisionSystem(self.objects)
         self.cameraZoom = CAMERA_ZOOM
+        self.gameOverScreen = GameOverScreen(canvas, onRestart=self.restart)
 
         self.delta = 0
         self.prevTime = time()
@@ -56,38 +59,49 @@ class Game():
         self.delta = self.currTime - self.prevTime
         self.prevTime = self.currTime
 
-    def gameLoop(self):
-        global player
+    def restart(self):
+        self.player = Player.fromAssets(ASSETS_DIR, PLAYER_START, PLAYER_SIZE)
+        self.objects = [self.player, *loadLevel()]
+        self.inputHandler = InputHandler(self.objects)
+        self.collisionSystem = CollisionSystem(self.objects)
+        self.hud.player = self.player
+        self.gameOverScreen.hide()
 
+    def gameLoop(self):
         while not self.exit:
             self.deltaTime()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.exit = True
 
-                self.inputHandler.handleEvent(event)
+                if self.player is None:
+                    self.gameOverScreen.handleEvent(event)
+                else:
+                    self.inputHandler.handleEvent(event)
 
             canvas.fill((0, 0, 0))
             self.renderer.update(self.objects, self.delta)
             self.collisionSystem.resolve()
             self.objects[:] = [obj for obj in self.objects if not getattr(obj, "destroyed", False)]
 
-            if player is not None and player.destroyed:
+            if self.player is not None and self.player.destroyed:
                 self.hud.player = None
-                player = None
+                self.player = None
+                self.gameOverScreen.show()
 
-            if player is not None:
-                self.camera.follow(player)
+            if self.player is not None:
+                self.camera.follow(self.player)
 
-                if self.camera.shouldZoomOut(player, triggerMargin=EDGE_ZOOM_MARGIN):
+                if self.camera.shouldZoomOut(self.player, triggerMargin=EDGE_ZOOM_MARGIN):
                     self.camera.setZoom(MIN_ZOOM, duration=ZOOM_DURATION, easing=ZOOM_EASING)
                 else:
                     self.camera.setZoom(self.cameraZoom, duration=ZOOM_DURATION, easing=ZOOM_EASING)
 
                 self.camera.update(self.delta)
-                self.camera.follow(player)
+                self.camera.follow(self.player)
 
-            self.renderer.draw(self.objects, self.camera.getOffset(), self.camera.zoom, background)
+            ui = self.gameOverScreen if self.player is None else None
+            self.renderer.draw(self.objects, self.camera.getOffset(), self.camera.zoom, background, ui=ui)
             self.hud.render()
             pygame.display.update()
 
