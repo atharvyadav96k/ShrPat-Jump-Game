@@ -28,13 +28,19 @@ def showStartScreen():
 
             startScreen.handleEvent(event)
 
+        delta = clock.tick(60) / 1000
+        startScreen.update(delta)
+
         canvas.fill((0, 0, 0))
         startScreen.draw(canvas)
         pygame.display.update()
-        clock.tick(60)
 
 
-showStartScreen()
+while True:
+    showStartScreen()
 
-game = Game(canvas)
-game.gameLoop()
+    game = Game(canvas)
+    game.gameLoop()
+
+    if game.windowClosed:
+        break

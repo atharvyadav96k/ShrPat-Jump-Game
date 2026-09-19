@@ -21,5 +21,8 @@ class StartScreen:
     def handleEvent(self, event):
         self.root.handleEvent(event)
 
+    def update(self, delta):
+        self.root.update(delta)
+
     def draw(self, canvas):
         self.root.draw(canvas)

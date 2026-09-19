@@ -27,6 +27,7 @@ class Game:
         screenWidth, screenHeight = canvas.get_size()
 
         self.exit = False
+        self.windowClosed = False
         self.player = Player.fromAssets(ASSETS_DIR, PLAYER_START, PLAYER_SIZE)
         self.background = Background(
             pygame.image.load(BG_IMAGE_PATH).convert(),
@@ -45,7 +46,7 @@ class Game:
         self.inputHandler = InputHandler(self.objects)
         self.collisionSystem = CollisionSystem(self.objects)
         self.cameraZoom = CAMERA_ZOOM
-        self.gameOverScreen = GameOverScreen(canvas, onRestart=self.restart)
+        self.gameOverScreen = GameOverScreen(canvas, onRestart=self.restart, onQuit=self.quitToMenu)
 
         self.delta = 0
         self.prevTime = time()
@@ -64,12 +65,16 @@ class Game:
         self.hud.player = self.player
         self.gameOverScreen.hide()
 
+    def quitToMenu(self):
+        self.exit = True
+
     def gameLoop(self):
         while not self.exit:
             self.deltaTime()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.exit = True
+                    self.windowClosed = True
 
                 if self.player is None:
                     self.gameOverScreen.handleEvent(event)
@@ -85,6 +90,9 @@ class Game:
                 self.hud.player = None
                 self.player = None
                 self.gameOverScreen.show()
+
+            if self.player is None:
+                self.gameOverScreen.update(self.delta)
 
             if self.player is not None:
                 self.camera.follow(self.player)
@@ -102,4 +110,5 @@ class Game:
             self.hud.render()
             pygame.display.update()
 
-        pygame.quit()
+        if self.windowClosed:
+            pygame.quit()
