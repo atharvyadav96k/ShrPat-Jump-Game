@@ -11,6 +11,8 @@ pygame.init()
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 720
 EDGE_ZOOM_MARGIN = 80
+ZOOM_DURATION = 0.4
+ZOOM_EASING = easing.easeOutQuad
 
 canvas = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("My Board")
@@ -30,6 +32,7 @@ class Game():
         self.objects = [player, *grounds]
         self.inputHandler = InputHandler(self.objects)
         self.collisionSystem = CollisionSystem(self.objects)
+        self.cameraZoom = 1
 
         self.delta = 0
         self.prevTime = time()
@@ -56,9 +59,9 @@ class Game():
             self.camera.follow(player)
 
             if self.camera.isNearEdge(player, margin=EDGE_ZOOM_MARGIN):
-                self.camera.setZoom(0.8, duration=0.5, easing=easing.easeOutQuad)
+                self.camera.setZoom(self.cameraZoom * 0.6, duration=ZOOM_DURATION, easing=ZOOM_EASING)
             else:
-                self.camera.setZoom(1.0, duration=0.35, easing=easing.easeOutCubic)
+                self.camera.setZoom(self.cameraZoom, duration=ZOOM_DURATION, easing=ZOOM_EASING)
 
             self.camera.update(self.delta)
             self.camera.follow(player)
