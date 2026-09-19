@@ -96,8 +96,8 @@ class ControllableObject:
         self.angle, self.speed = 0, 0
         self.activeSpeedKey = None
 
-    def drawObject(self, canvas):
-        self.gameObject.drawObject(canvas)
+    def drawObject(self, canvas, offset=(0, 0)):
+        self.gameObject.drawObject(canvas, offset)
 
     def update(self, delta):
         self.previousBounds = self.gameObject.getBounds()

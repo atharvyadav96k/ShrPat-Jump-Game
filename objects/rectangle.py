@@ -27,11 +27,13 @@ class Rectangle(Object):
         self.rectCords[0] += dx
         self.rectCords[1] += dy
 
-    def drawObject(self, canvas):
+    def drawObject(self, canvas, offset=(0, 0)):
+        ox, oy = offset
+        x, y, w, h = self.rectCords
         pygame.draw.rect(
             canvas,
             self.color,
-            pygame.Rect(*self.rectCords)
+            pygame.Rect(x - ox, y - oy, w, h)
         )
 
     def objectCollision(self):

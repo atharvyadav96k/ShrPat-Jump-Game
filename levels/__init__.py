@@ -1,1 +1,1 @@
-from .loadLevel import loadLevel
+from .loadLevel import loadLevel, getLevelSize

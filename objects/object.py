@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class Object(ABC):
     @abstractmethod
-    def drawObject(self, canvas):
+    def drawObject(self, canvas, offset=(0, 0)):
         pass
     @abstractmethod
     def getObjName(self):
