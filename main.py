@@ -68,6 +68,7 @@ class Game():
             canvas.fill((0, 0, 0))
             self.renderer.update(self.objects, self.delta)
             self.collisionSystem.resolve()
+            self.objects[:] = [obj for obj in self.objects if not getattr(obj, "destroyed", False)]
 
             self.camera.follow(player)
 

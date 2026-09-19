@@ -1,14 +1,13 @@
 import os
 import pygame
 from objects import Rectangle, TiledImage
-from gameobjects import Ground, Boxes
+from gameobjects import Ground, WoodBox
 from .map import map as levelMap
 
 TILE_SIZE = 50
 GROUND_TOP_INSET = 10
 GROUND_Z_INDEX = 4
 GRASS_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "ground", "grass")
-BOX_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "particles", "sparks")
 
 
 def _loadGrassTiles():
@@ -28,7 +27,7 @@ def _mergeRuns(cells):
 
     while col < len(cells):
         cell = cells[col]
-        if cell not in ('_', '*', '#'):
+        if cell not in ('_', '$', '#'):
             col += 1
             continue
 
@@ -56,8 +55,8 @@ def loadLevel(color=(255, 255, 255)):
                 ground = Ground(gameObject, zIndex=GROUND_Z_INDEX)
                 ground.setHitbox(offset=(0, GROUND_TOP_INSET), size=(width, TILE_SIZE - GROUND_TOP_INSET))
                 grounds.append(ground)
-            elif cell == '*':
-                grounds.append(Boxes.fromAssets(BOX_DIR, [x, y], [width, TILE_SIZE]))
+            elif cell == '$':
+                grounds.append(WoodBox.fromRect([x, y], [width, TILE_SIZE]))
             elif cell == '#':
                 grounds.append(Ground(Rectangle(f"border_{row}_{startCol}", [x, y], [width, TILE_SIZE], color)))
 
