@@ -4,7 +4,8 @@ from renderer import Renderer, HUD, Camera, Background, easing
 from gameevents import InputHandler, CollisionSystem
 from gameobjects import Player
 from levels import loadLevel, getLevelSize
-from gamescreen import GameOverScreen
+from gamescreen import GameOverScreen, PauseScreen
+from ui import Root, Button
 
 EDGE_ZOOM_MARGIN = 80
 ZOOM_DURATION = 0.4
@@ -18,6 +19,7 @@ MIN_ZOOM = CAMERA_ZOOM * EDGE_ZOOM_OUT_FACTOR
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets", "female-character")
 BG_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "assets", "bg.png")
 BACKGROUND_PARALLAX = 0.8
+PAUSE_BUTTON_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "assets", "ui", "buttons", "pause", "pause_button.png")
 
 
 class Game:
@@ -46,6 +48,15 @@ class Game:
         self.cameraZoom = CAMERA_ZOOM
         self.gameOverScreen = GameOverScreen(canvas, onRestart=self.restart, onQuit=self._quit)
 
+        self.paused = False
+        self.pauseScreen = PauseScreen(canvas, onResume=self.togglePause, onQuit=self._quit)
+        pauseButtonImage = pygame.image.load(PAUSE_BUTTON_IMAGE_PATH).convert_alpha()
+        self.pauseUI = Root(canvas)
+        self.pauseUI.addChild(Button(
+            x=0.02, y=0.02, width=0.06, height=0.1, anchor="topleft",
+            text="", onClick=self.togglePause, image=pauseButtonImage,
+        ))
+
     def restart(self):
         self.player = Player.fromAssets(ASSETS_DIR, PLAYER_START, PLAYER_SIZE)
         self.objects = [self.player, *loadLevel()]
@@ -58,13 +69,37 @@ class Game:
         if self.onQuit:
             self.onQuit()
 
+    def togglePause(self):
+        if self.player is None:
+            return
+
+        self.paused = not self.paused
+
+        if self.paused:
+            self.pauseScreen.show()
+        else:
+            self.pauseScreen.hide()
+
     def handleEvent(self, event):
         if self.player is None:
             self.gameOverScreen.handleEvent(event)
+            return
+
+        self.pauseUI.handleEvent(event)
+
+        if self.paused:
+            self.pauseScreen.handleEvent(event)
         else:
             self.inputHandler.handleEvent(event)
 
     def update(self, delta):
+        if self.player is not None:
+            self.pauseUI.update(delta)
+
+        if self.paused:
+            self.pauseScreen.update(delta)
+            return
+
         self.renderer.update(self.objects, delta)
         self.collisionSystem.resolve()
         self.objects[:] = [obj for obj in self.objects if not getattr(obj, "destroyed", False)]
@@ -92,3 +127,9 @@ class Game:
         ui = self.gameOverScreen if self.player is None else None
         self.renderer.draw(self.objects, self.camera.getOffset(), self.camera.zoom, self.background, ui=ui)
         self.hud.render()
+
+        if self.player is not None:
+            self.pauseUI.draw(canvas)
+
+            if self.paused:
+                self.pauseScreen.draw(canvas)
