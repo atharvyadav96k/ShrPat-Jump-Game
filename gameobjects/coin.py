@@ -31,6 +31,7 @@ def _loadNumberedFrames(dirPath):
 class Coin(ControllableObject):
     def __init__(self, gameObject):
         super().__init__(gameObject, collidable=True, rigid=True, zIndex=3)
+        self.passthrough = True
         self.animator = Animator(gameObject)
         self.destroyed = False
 

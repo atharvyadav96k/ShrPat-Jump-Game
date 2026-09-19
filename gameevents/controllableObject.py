@@ -13,6 +13,7 @@ class ControllableObject:
         self.activeSpeedKey = None
         self.collidable = collidable
         self.rigid = rigid
+        self.passthrough = False
         self.gravity = gravity
         self.gravityAccel = gravityAccel
         self.friction = friction
@@ -48,7 +49,7 @@ class ControllableObject:
         self.hitboxSize = size
 
     def onCollision(self, other):
-        if self.rigid:
+        if self.rigid or getattr(other, "passthrough", False):
             return
 
         x, y, w, h = self.getBounds()
