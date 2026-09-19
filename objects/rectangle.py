@@ -17,6 +17,13 @@ class Rectangle(Object):
     def getObjName(self):
         return self.objectName
 
+    def getBounds(self):
+        return tuple(self.rectCords)
+
+    def setPosition(self, x, y):
+        self.rectCords[0] = x
+        self.rectCords[1] = y
+
     def moveObject(self, directionAngle, directionSpeed, delta):
         angle = math.radians(directionAngle)
 

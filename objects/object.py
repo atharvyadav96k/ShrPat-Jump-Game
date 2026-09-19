@@ -13,5 +13,13 @@ class Object(ABC):
         pass
 
     @abstractmethod
+    def getBounds(self):
+        pass
+
+    @abstractmethod
+    def setPosition(self, x, y):
+        pass
+
+    @abstractmethod
     def objectCollision(self):
         pass

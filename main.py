@@ -2,7 +2,7 @@ import pygame
 from time import time
 from objects import Rectangle
 from renderer import Renderer
-from gameevents import ControllableObject, InputHandler
+from gameevents import ControllableObject, InputHandler, CollisionSystem
 
 pygame.init()
 
@@ -16,12 +16,16 @@ player = ControllableObject(
         pygame.K_UP: (270, 100),
         pygame.K_DOWN: (90, 100),
     },
+    collidable=True,
 )
-ground = ControllableObject(Rectangle("background", [0, 201], [1200, 100], (255, 255, 255)),
+
+ground = ControllableObject(
+    Rectangle("background", [0, 201], [1200, 100], (255, 255, 255)),
     bindings={
-            pygame.K_LEFT: (0, 100),
-            pygame.K_RIGHT: (180, 100),
-    }
+        pygame.K_LEFT: (0, 100),
+        pygame.K_RIGHT: (180, 100),
+    },
+    collidable=True,
 )
 
 class Game():
@@ -30,6 +34,7 @@ class Game():
         self.renderer = Renderer(canvas)
         self.objects = [player, ground]
         self.inputHandler = InputHandler(self.objects)
+        self.collisionSystem = CollisionSystem(self.objects)
 
         self.delta = 0
         self.prevTime = time()
@@ -51,6 +56,7 @@ class Game():
 
             canvas.fill((0, 0, 0))
             self.renderer.render(self.objects, self.delta)
+            self.collisionSystem.resolve()
             pygame.display.update()
 
         pygame.quit()
