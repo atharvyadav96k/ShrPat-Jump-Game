@@ -1,6 +1,7 @@
 import pygame
 from game import Game
 from gamescreen import StartScreen
+from screenmanager import ScreenManager
 
 pygame.init()
 
@@ -9,38 +10,16 @@ SCREEN_HEIGHT = 720
 
 canvas = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.RESIZABLE)
 
+manager = ScreenManager(canvas)
+
 
 def showStartScreen():
-    started = False
-
-    def onStart():
-        nonlocal started
-        started = True
-
-    startScreen = StartScreen(canvas, onStart=onStart)
-    clock = pygame.time.Clock()
-
-    while not started:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                raise SystemExit
-
-            startScreen.handleEvent(event)
-
-        delta = clock.tick(60) / 1000
-        startScreen.update(delta)
-
-        canvas.fill((0, 0, 0))
-        startScreen.draw(canvas)
-        pygame.display.update()
+    manager.setScreen(StartScreen(canvas, onStart=showGame))
 
 
-while True:
-    showStartScreen()
+def showGame():
+    manager.setScreen(Game(canvas, onQuit=showStartScreen))
 
-    game = Game(canvas)
-    game.gameLoop()
 
-    if game.windowClosed:
-        break
+showStartScreen()
+manager.run()

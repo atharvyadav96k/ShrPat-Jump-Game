@@ -1,6 +1,5 @@
 import os
 import pygame
-from time import time
 from renderer import Renderer, HUD, Camera, Background, easing
 from gameevents import InputHandler, CollisionSystem
 from gameobjects import Player
@@ -22,12 +21,11 @@ BACKGROUND_PARALLAX = 0.8
 
 
 class Game:
-    def __init__(self, canvas):
+    def __init__(self, canvas, onQuit=None):
         self.canvas = canvas
+        self.onQuit = onQuit
         screenWidth, screenHeight = canvas.get_size()
 
-        self.exit = False
-        self.windowClosed = False
         self.player = Player.fromAssets(ASSETS_DIR, PLAYER_START, PLAYER_SIZE)
         self.background = Background(
             pygame.image.load(BG_IMAGE_PATH).convert(),
@@ -46,16 +44,7 @@ class Game:
         self.inputHandler = InputHandler(self.objects)
         self.collisionSystem = CollisionSystem(self.objects)
         self.cameraZoom = CAMERA_ZOOM
-        self.gameOverScreen = GameOverScreen(canvas, onRestart=self.restart, onQuit=self.quitToMenu)
-
-        self.delta = 0
-        self.prevTime = time()
-        self.currTime = time()
-
-    def deltaTime(self):
-        self.currTime = time()
-        self.delta = self.currTime - self.prevTime
-        self.prevTime = self.currTime
+        self.gameOverScreen = GameOverScreen(canvas, onRestart=self.restart, onQuit=self._quit)
 
     def restart(self):
         self.player = Player.fromAssets(ASSETS_DIR, PLAYER_START, PLAYER_SIZE)
@@ -65,50 +54,41 @@ class Game:
         self.hud.player = self.player
         self.gameOverScreen.hide()
 
-    def quitToMenu(self):
-        self.exit = True
+    def _quit(self):
+        if self.onQuit:
+            self.onQuit()
 
-    def gameLoop(self):
-        while not self.exit:
-            self.deltaTime()
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.exit = True
-                    self.windowClosed = True
+    def handleEvent(self, event):
+        if self.player is None:
+            self.gameOverScreen.handleEvent(event)
+        else:
+            self.inputHandler.handleEvent(event)
 
-                if self.player is None:
-                    self.gameOverScreen.handleEvent(event)
-                else:
-                    self.inputHandler.handleEvent(event)
+    def update(self, delta):
+        self.renderer.update(self.objects, delta)
+        self.collisionSystem.resolve()
+        self.objects[:] = [obj for obj in self.objects if not getattr(obj, "destroyed", False)]
 
-            self.canvas.fill((0, 0, 0))
-            self.renderer.update(self.objects, self.delta)
-            self.collisionSystem.resolve()
-            self.objects[:] = [obj for obj in self.objects if not getattr(obj, "destroyed", False)]
+        if self.player is not None and self.player.destroyed:
+            self.hud.player = None
+            self.player = None
+            self.gameOverScreen.show()
 
-            if self.player is not None and self.player.destroyed:
-                self.hud.player = None
-                self.player = None
-                self.gameOverScreen.show()
+        if self.player is None:
+            self.gameOverScreen.update(delta)
 
-            if self.player is None:
-                self.gameOverScreen.update(self.delta)
+        if self.player is not None:
+            self.camera.follow(self.player)
 
-            if self.player is not None:
-                self.camera.follow(self.player)
+            if self.camera.shouldZoomOut(self.player, triggerMargin=EDGE_ZOOM_MARGIN):
+                self.camera.setZoom(MIN_ZOOM, duration=ZOOM_DURATION, easing=ZOOM_EASING)
+            else:
+                self.camera.setZoom(self.cameraZoom, duration=ZOOM_DURATION, easing=ZOOM_EASING)
 
-                if self.camera.shouldZoomOut(self.player, triggerMargin=EDGE_ZOOM_MARGIN):
-                    self.camera.setZoom(MIN_ZOOM, duration=ZOOM_DURATION, easing=ZOOM_EASING)
-                else:
-                    self.camera.setZoom(self.cameraZoom, duration=ZOOM_DURATION, easing=ZOOM_EASING)
+            self.camera.update(delta)
+            self.camera.follow(self.player)
 
-                self.camera.update(self.delta)
-                self.camera.follow(self.player)
-
-            ui = self.gameOverScreen if self.player is None else None
-            self.renderer.draw(self.objects, self.camera.getOffset(), self.camera.zoom, self.background, ui=ui)
-            self.hud.render()
-            pygame.display.update()
-
-        if self.windowClosed:
-            pygame.quit()
+    def draw(self, canvas):
+        ui = self.gameOverScreen if self.player is None else None
+        self.renderer.draw(self.objects, self.camera.getOffset(), self.camera.zoom, self.background, ui=ui)
+        self.hud.render()
