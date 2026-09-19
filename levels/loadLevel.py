@@ -1,7 +1,7 @@
 import os
 import pygame
 from objects import TiledImage
-from gameobjects import Ground, WoodBox, KillObstacle, HorizontalMovingKillObstacle, VerticalMovingKillObstacle
+from gameobjects import Ground, WoodBox, KillObstacle, HorizontalMovingKillObstacle, VerticalMovingKillObstacle, ScoreCoin, JumpCoin
 from .map import map as DEFAULT_MAP
 
 TILE_SIZE = 50
@@ -31,7 +31,7 @@ def _mergeRuns(cells):
 
     while col < len(cells):
         cell = cells[col]
-        if cell not in ('_', '$', '!', 'H', 'V'):
+        if cell not in ('_', '$', '!', 'H', 'V', 'Y', 'B'):
             col += 1
             continue
 
@@ -72,5 +72,9 @@ def loadLevel(levelMap=None):
                 grounds.append(VerticalMovingKillObstacle.fromAssets(
                     [x, y], [width, TILE_SIZE], travelDistance=TILE_SIZE * MOVING_KILL_TRAVEL_TILES, speed=MOVING_KILL_SPEED
                 ))
+            elif cell == 'Y':
+                grounds.append(ScoreCoin.fromAssets([x, y], [width, TILE_SIZE]))
+            elif cell == 'B':
+                grounds.append(JumpCoin.fromAssets([x, y], [width, TILE_SIZE]))
 
     return grounds

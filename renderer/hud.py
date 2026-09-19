@@ -16,6 +16,10 @@ class HUD:
         healthRect = healthSurface.get_rect(topleft=(10, 10))
         self.canvas.blit(healthSurface, healthRect)
 
+        scoreSurface = self.font.render(f"Score: {self.player.score}", True, (255, 255, 255))
+        scoreRect = scoreSurface.get_rect(topleft=(10, healthRect.bottom + 4))
+        self.canvas.blit(scoreSurface, scoreRect)
+
         if self.player.airJumpLocked:
             remaining = max(0, self.player.airJumpRefillTime - self.player.airJumpTimer)
             text = f"Boost: recharging {remaining:.1f}s"

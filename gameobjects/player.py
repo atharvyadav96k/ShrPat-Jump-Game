@@ -28,6 +28,7 @@ class Player(ControllableObject):
         self.animState = "idle"
         self.airborneVelocityThreshold = 100
         self.destroyed = False
+        self.score = 0
 
         self.bindSpeedKey(pygame.K_LEFT, 180, walkSpeed)
         self.bindSpeedKey(pygame.K_RIGHT, 0, walkSpeed)
@@ -55,6 +56,14 @@ class Player(ControllableObject):
     def refillAirJumps(self):
         self.airJumpsRemaining = self.maxAirJumps
         self.airJumpLocked = False
+
+    def grantExtraJump(self, amount=1):
+        self.airJumpsRemaining = min(self.maxAirJumps, self.airJumpsRemaining + amount)
+        if self.airJumpsRemaining > 0:
+            self.airJumpLocked = False
+
+    def addScore(self, amount):
+        self.score += amount
 
     def takeDamage(self, amount):
         if not self.isAlive():

@@ -4,7 +4,7 @@ from objects import Image
 from animation import Animator
 from .killObstacle import KillObstacle
 
-SAW_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "gameobjects")
+SAW_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "gameobjects", "saw")
 SAW_FRAME_DURATION = 0.08
 
 _sawFramesCache = None
