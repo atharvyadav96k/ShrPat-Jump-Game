@@ -57,6 +57,8 @@ class Game():
         self.prevTime = self.currTime
 
     def gameLoop(self):
+        global player
+
         while not self.exit:
             self.deltaTime()
             for event in pygame.event.get():
@@ -70,15 +72,20 @@ class Game():
             self.collisionSystem.resolve()
             self.objects[:] = [obj for obj in self.objects if not getattr(obj, "destroyed", False)]
 
-            self.camera.follow(player)
+            if player is not None and player.destroyed:
+                self.hud.player = None
+                player = None
 
-            if self.camera.shouldZoomOut(player, triggerMargin=EDGE_ZOOM_MARGIN):
-                self.camera.setZoom(MIN_ZOOM, duration=ZOOM_DURATION, easing=ZOOM_EASING)
-            else:
-                self.camera.setZoom(self.cameraZoom, duration=ZOOM_DURATION, easing=ZOOM_EASING)
+            if player is not None:
+                self.camera.follow(player)
 
-            self.camera.update(self.delta)
-            self.camera.follow(player)
+                if self.camera.shouldZoomOut(player, triggerMargin=EDGE_ZOOM_MARGIN):
+                    self.camera.setZoom(MIN_ZOOM, duration=ZOOM_DURATION, easing=ZOOM_EASING)
+                else:
+                    self.camera.setZoom(self.cameraZoom, duration=ZOOM_DURATION, easing=ZOOM_EASING)
+
+                self.camera.update(self.delta)
+                self.camera.follow(player)
 
             self.renderer.draw(self.objects, self.camera.getOffset(), self.camera.zoom, background)
             self.hud.render()

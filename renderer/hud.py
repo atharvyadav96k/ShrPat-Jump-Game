@@ -8,6 +8,9 @@ class HUD:
         self.font = pygame.font.SysFont(None, 28)
 
     def render(self):
+        if self.player is None:
+            return
+
         healthText = f"Health: {self.player.health}/{self.player.maxHealth}"
         healthSurface = self.font.render(healthText, True, (255, 255, 255))
         healthRect = healthSurface.get_rect(topleft=(10, 10))

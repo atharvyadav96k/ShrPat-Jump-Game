@@ -25,6 +25,7 @@ class Player(ControllableObject):
         self.animator = Animator(gameObject)
         self.animState = "idle"
         self.airborneVelocityThreshold = 100
+        self.destroyed = False
 
         self.bindSpeedKey(pygame.K_LEFT, 180, walkSpeed)
         self.bindSpeedKey(pygame.K_RIGHT, 0, walkSpeed)
@@ -54,7 +55,12 @@ class Player(ControllableObject):
         self.airJumpLocked = False
 
     def takeDamage(self, amount):
+        if not self.isAlive():
+            return
+
         self.health = max(0, self.health - amount)
+        if not self.isAlive():
+            self._setAnimState("die", restart=True)
 
     def heal(self, amount):
         self.health = min(self.maxHealth, self.health + amount)
@@ -71,12 +77,14 @@ class Player(ControllableObject):
         ]
         jumpFrames = cls._loadFrameSequence(os.path.join(assetsDir, "jump"))
         fallFrames = cls._loadFrameSequence(os.path.join(assetsDir, "falling"))
+        dieFrames = cls._loadFrameSequence(os.path.join(assetsDir, "die"))
 
         player = cls(Image("player", position, size, idleFrame), **kwargs)
         player.animator.add("idle", [idleFrame], loop=True)
         player.animator.add("walk", walkFrames, frameDuration=0.04, loop=True)
         player.animator.add("jump", jumpFrames, frameDuration=0.08, loop=False)
         player.animator.add("fall", fallFrames, frameDuration=0.08, loop=False, waitForTrigger=True)
+        player.animator.add("die", dieFrames, frameDuration=0.1, loop=False)
         player.animator.setState("idle")
         return player
 
@@ -130,6 +138,12 @@ class Player(ControllableObject):
         self.animator.setFacing(angle)
 
     def update(self, delta):
+        if not self.isAlive():
+            self.animator.update(delta)
+            if self.animator.animations["die"].isFinished():
+                self.destroyed = True
+            return
+
         wasGrounded = self.grounded
         self.grounded = False
 
