@@ -1,6 +1,6 @@
 import os
 import pygame
-from objects import Rectangle, TiledImage
+from objects import TiledImage
 from gameobjects import Ground, WoodBox
 from .map import map as levelMap
 
@@ -27,7 +27,7 @@ def _mergeRuns(cells):
 
     while col < len(cells):
         cell = cells[col]
-        if cell not in ('_', '$', '#'):
+        if cell not in ('_', '$'):
             col += 1
             continue
 
@@ -40,7 +40,7 @@ def _mergeRuns(cells):
     return runs
 
 
-def loadLevel(color=(255, 255, 255)):
+def loadLevel():
     grassTiles = _loadGrassTiles()
     grounds = []
 
@@ -57,7 +57,5 @@ def loadLevel(color=(255, 255, 255)):
                 grounds.append(ground)
             elif cell == '$':
                 grounds.append(WoodBox.fromRect([x, y], [width, TILE_SIZE]))
-            elif cell == '#':
-                grounds.append(Ground(Rectangle(f"border_{row}_{startCol}", [x, y], [width, TILE_SIZE], color)))
 
     return grounds

@@ -7,8 +7,10 @@ from gameevents.controllableObject import ControllableObject
 
 class Player(ControllableObject):
     def __init__(self, gameObject, walkSpeed=200, jumpForce=400, maxAirJumps=1, airJumpRefillTime=5,
-                 gravityAccel=900, friction=0, zIndex=1):
+                 gravityAccel=900, friction=0, zIndex=1, maxHealth=100):
         super().__init__(gameObject, collidable=True, gravity=True, gravityAccel=gravityAccel, friction=friction, zIndex=zIndex)
+        self.maxHealth = maxHealth
+        self.health = maxHealth
         self.jumpForce = jumpForce
         self.grounded = False
         self.groundY = gameObject.getBounds()[1]
@@ -50,6 +52,15 @@ class Player(ControllableObject):
     def refillAirJumps(self):
         self.airJumpsRemaining = self.maxAirJumps
         self.airJumpLocked = False
+
+    def takeDamage(self, amount):
+        self.health = max(0, self.health - amount)
+
+    def heal(self, amount):
+        self.health = min(self.maxHealth, self.health + amount)
+
+    def isAlive(self):
+        return self.health > 0
 
     @classmethod
     def fromAssets(cls, assetsDir, position, size, **kwargs):
