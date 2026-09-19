@@ -4,8 +4,8 @@ from .object import Object
 
 
 class Rectangle(Object):
-    def __init__(self, objectName,rectCords, rectSize):
-        self.color = (255, 255, 255)
+    def __init__(self, objectName,rectCords, rectSize, color):
+        self.color = color
         self.objectName = objectName
         self.rectCords = [
             rectCords[0],
