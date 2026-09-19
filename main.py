@@ -27,6 +27,7 @@ ground = ControllableObject(
         pygame.K_RIGHT: (180, 100),
     },
     collidable=True,
+    rigid=True,
 )
 
 class Game():

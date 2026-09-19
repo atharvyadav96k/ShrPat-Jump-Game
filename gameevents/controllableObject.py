@@ -1,11 +1,12 @@
 class ControllableObject:
-    def __init__(self, gameObject, bindings=None, collidable=False, gravity=False, gravityAccel=900):
+    def __init__(self, gameObject, bindings=None, collidable=False, rigid=False, gravity=False, gravityAccel=900):
         self.gameObject = gameObject
         self.bindings = dict(bindings) if bindings else {}
         self.angle = 0
         self.speed = 0
         self.activeKey = None
         self.collidable = collidable
+        self.rigid = rigid
         self.previousBounds = gameObject.getBounds()
         self.gravity = gravity
         self.gravityAccel = gravityAccel
@@ -29,6 +30,9 @@ class ControllableObject:
         return self.gameObject.getBounds()
 
     def onCollision(self, other):
+        if self.rigid:
+            return
+
         x, y, _, _ = self.previousBounds
         self.gameObject.setPosition(x, y)
         self.verticalVelocity = 0
