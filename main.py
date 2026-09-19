@@ -1,6 +1,7 @@
+import os
 import pygame
 from time import time
-from objects import Rectangle
+from objects import Image
 from renderer import Renderer, HUD, Camera, easing
 from gameevents import Obstacle, InputHandler, CollisionSystem
 from gameobjects import Player
@@ -13,12 +14,19 @@ SCREEN_HEIGHT = 720
 EDGE_ZOOM_MARGIN = 80
 ZOOM_DURATION = 0.4
 ZOOM_EASING = easing.easeOutQuad
+PLAYER_SIZE = [42, 70]
 
 canvas = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("My Board")
 
+ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets", "female-character")
+playerFrames = [
+    pygame.image.load(os.path.join(ASSETS_DIR, f"{i}.png")).convert_alpha()
+    for i in range(1, 8)
+]
 
-player = Player(Rectangle("player", [100, 0], [20, 70], (255, 255, 255)))
+player = Player(Image("player", [100, 0], PLAYER_SIZE, playerFrames[0]))
+player.setAnimation(playerFrames, frameDuration=0.08)
 
 grounds = loadLevel()
 LEVEL_WIDTH, LEVEL_HEIGHT = getLevelSize()
