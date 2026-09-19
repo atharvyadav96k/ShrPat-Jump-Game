@@ -15,6 +15,7 @@ class Camera:
         self.zoomDuration = zoomDuration
         self.zoomElapsed = 0
         self.easing = easing
+        self.edgeZoomed = False
 
     def setZoom(self, zoom, duration=None, easing=None):
         if zoom == self.targetZoom:
@@ -75,3 +76,16 @@ class Camera:
             or screenX + screenW > self.screenWidth - margin
             or screenY + screenH > self.screenHeight - margin
         )
+
+    def shouldZoomOut(self, target, triggerMargin=80, releaseMargin=None):
+        if releaseMargin is None:
+            releaseMargin = triggerMargin * 1.5
+
+        if self.edgeZoomed:
+            if not self.isNearEdge(target, margin=releaseMargin):
+                self.edgeZoomed = False
+        else:
+            if self.isNearEdge(target, margin=triggerMargin):
+                self.edgeZoomed = True
+
+        return self.edgeZoomed

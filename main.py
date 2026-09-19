@@ -58,7 +58,7 @@ class Game():
 
             self.camera.follow(player)
 
-            if self.camera.isNearEdge(player, margin=EDGE_ZOOM_MARGIN):
+            if self.camera.shouldZoomOut(player, triggerMargin=EDGE_ZOOM_MARGIN):
                 self.camera.setZoom(self.cameraZoom * 0.6, duration=ZOOM_DURATION, easing=ZOOM_EASING)
             else:
                 self.camera.setZoom(self.cameraZoom, duration=ZOOM_DURATION, easing=ZOOM_EASING)
