@@ -4,7 +4,8 @@ from renderer import Renderer, HUD, Camera, Background, easing
 from gameevents import InputHandler, CollisionSystem
 from gameobjects import Player
 from levels import loadLevel, getLevelSize
-from gamescreen import GameOverScreen, PauseScreen, StartScreen
+from levels.maps import MAPS
+from gamescreen import GameOverScreen, PauseScreen, StartScreen, LevelSelectScreen
 from ui import Root, Button
 
 EDGE_ZOOM_MARGIN = 80
@@ -22,10 +23,22 @@ BACKGROUND_PARALLAX = 0.8
 PAUSE_BUTTON_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "assets", "ui", "buttons", "pause", "pause_button.png")
 
 
+def _showLevelSelect(canvas, manager):
+    manager.setScreen(LevelSelectScreen(
+        canvas, len(MAPS),
+        onSelectLevel=lambda index: manager.setScreen(Game(canvas, manager, levelMap=MAPS[index])),
+    ))
+
+
+def buildStartScreen(canvas, manager):
+    return StartScreen(canvas, onStart=lambda: _showLevelSelect(canvas, manager))
+
+
 class Game:
-    def __init__(self, canvas, manager):
+    def __init__(self, canvas, manager, levelMap=None):
         self.canvas = canvas
         self.manager = manager
+        self.levelMap = levelMap
         screenWidth, screenHeight = canvas.get_size()
 
         self.player = Player.fromAssets(ASSETS_DIR, PLAYER_START, PLAYER_SIZE)
@@ -36,8 +49,8 @@ class Game:
             minZoom=MIN_ZOOM,
         )
 
-        grounds = loadLevel()
-        levelWidth, levelHeight = getLevelSize()
+        grounds = loadLevel(self.levelMap)
+        levelWidth, levelHeight = getLevelSize(self.levelMap)
 
         self.renderer = Renderer(canvas)
         self.hud = HUD(canvas, self.player)
@@ -59,17 +72,14 @@ class Game:
 
     def restart(self):
         self.player = Player.fromAssets(ASSETS_DIR, PLAYER_START, PLAYER_SIZE)
-        self.objects = [self.player, *loadLevel()]
+        self.objects = [self.player, *loadLevel(self.levelMap)]
         self.inputHandler = InputHandler(self.objects)
         self.collisionSystem = CollisionSystem(self.objects)
         self.hud.player = self.player
         self.gameOverScreen.hide()
 
     def _quit(self):
-        self.manager.setScreen(StartScreen(self.canvas, onStart=self._startNewGame))
-
-    def _startNewGame(self):
-        self.manager.setScreen(Game(self.canvas, self.manager))
+        self.manager.setScreen(buildStartScreen(self.canvas, self.manager))
 
     def togglePause(self):
         if self.player is None:
