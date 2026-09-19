@@ -1,4 +1,5 @@
 import pygame
+import math
 from .object import Object
 
 
@@ -12,6 +13,15 @@ class Rectangle(Object):
             rectSize[0],
             rectSize[1]
         ]
+
+    def moveObject(self, directionAngle, directionSpeed, delta):
+        angle = math.radians(directionAngle)
+
+        dx = math.cos(angle) * directionSpeed * delta
+        dy = math.sin(angle) * directionSpeed * delta
+
+        self.rectCords[0] += dx
+        self.rectCords[1] += dy
 
     def drawObject(self, canvas):
         pygame.draw.rect(
