@@ -8,6 +8,7 @@ class Player(ControllableObject):
         super().__init__(gameObject, collidable=True, gravity=True, gravityAccel=gravityAccel, friction=friction, zIndex=zIndex)
         self.jumpForce = jumpForce
         self.grounded = False
+        self.groundY = gameObject.getBounds()[1]
 
         self.maxAirJumps = maxAirJumps
         self.airJumpsRemaining = maxAirJumps
@@ -39,6 +40,9 @@ class Player(ControllableObject):
         self.airJumpsRemaining = self.maxAirJumps
         self.airJumpLocked = False
 
+    def heightAboveGround(self):
+        return max(0, self.groundY - self.getBounds()[1])
+
     def handleKeyDown(self, key):
         if key == pygame.K_UP:
             self.jump()
@@ -67,4 +71,5 @@ class Player(ControllableObject):
 
         if wasFalling and self.vy == 0:
             self.grounded = True
+            self.groundY = self.getBounds()[1]
             self.refillAirJumps()

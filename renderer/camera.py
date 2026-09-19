@@ -47,10 +47,31 @@ class Camera:
         self.y = ty + th / 2 - viewHeight / 2
 
         if self.levelWidth is not None:
-            self.x = max(0, min(self.x, max(0, self.levelWidth - viewWidth)))
+            if viewWidth >= self.levelWidth:
+                self.x = (self.levelWidth - viewWidth) / 2
+            else:
+                self.x = max(0, min(self.x, self.levelWidth - viewWidth))
 
         if self.levelHeight is not None:
-            self.y = max(0, min(self.y, max(0, self.levelHeight - viewHeight)))
+            if viewHeight >= self.levelHeight:
+                self.y = (self.levelHeight - viewHeight) / 2
+            else:
+                self.y = max(0, min(self.y, self.levelHeight - viewHeight))
 
     def getOffset(self):
         return self.x, self.y
+
+    def isNearEdge(self, target, margin=50):
+        tx, ty, tw, th = target.getBounds()
+
+        screenX = (tx - self.x) * self.zoom
+        screenY = (ty - self.y) * self.zoom
+        screenW = tw * self.zoom
+        screenH = th * self.zoom
+
+        return (
+            screenX < margin
+            or screenY < margin
+            or screenX + screenW > self.screenWidth - margin
+            or screenY + screenH > self.screenHeight - margin
+        )
