@@ -1,7 +1,7 @@
 import os
 import pygame
 from objects import TiledImage
-from gameobjects import Ground, WoodBox
+from gameobjects import Ground, WoodBox, KillObstacle
 from .map import map as levelMap
 
 TILE_SIZE = 50
@@ -27,7 +27,7 @@ def _mergeRuns(cells):
 
     while col < len(cells):
         cell = cells[col]
-        if cell not in ('_', '$'):
+        if cell not in ('_', '$', '!'):
             col += 1
             continue
 
@@ -44,7 +44,7 @@ def loadLevel():
     grassTiles = _loadGrassTiles()
     grounds = []
 
-    for row, cells in enumerate(levelMap[:-1]):
+    for row, cells in enumerate(levelMap):
         for cell, startCol, length in _mergeRuns(cells):
             x = startCol * TILE_SIZE
             y = row * TILE_SIZE
@@ -57,5 +57,7 @@ def loadLevel():
                 grounds.append(ground)
             elif cell == '$':
                 grounds.append(WoodBox.fromRect([x, y], [width, TILE_SIZE]))
+            elif cell == '!':
+                grounds.append(KillObstacle.fromRect([x, y], [width, TILE_SIZE]))
 
     return grounds
