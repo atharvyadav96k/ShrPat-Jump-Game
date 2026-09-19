@@ -13,9 +13,9 @@ pygame.display.set_caption("My Board")
 player = ControllableObject(
     Rectangle("player", [100, 0], [50, 100], (255, 255, 255)),
     bindings={
-        pygame.K_w: (270, 400),
-        pygame.K_LEFT: (180, 150),
-        pygame.K_RIGHT: (0, 150),
+        pygame.K_UP: (270, 400),
+        pygame.K_RIGHT: (180, 150),
+        pygame.K_LEFT: (0, 150),
     },
     collidable=True,
     gravity=True,
@@ -24,8 +24,8 @@ player = ControllableObject(
 ground = ControllableObject(
     Rectangle("background", [0, 201], [1200, 100], (255, 255, 255)),
     bindings={
-        pygame.K_a: (180, 150),
-        pygame.K_d: (0, 150),
+        pygame.K_RIGHT: (180, 150),
+        pygame.K_LEFT: (0, 150),
     },
     collidable=True,
     rigid=True,
