@@ -4,7 +4,7 @@ from renderer import Renderer, HUD, Camera, Background, easing
 from gameevents import InputHandler, CollisionSystem
 from gameobjects import Player
 from levels import loadLevel, getLevelSize
-from gamescreen import GameOverScreen, PauseScreen
+from gamescreen import GameOverScreen, PauseScreen, StartScreen
 from ui import Root, Button
 
 EDGE_ZOOM_MARGIN = 80
@@ -23,9 +23,9 @@ PAUSE_BUTTON_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "assets", "ui"
 
 
 class Game:
-    def __init__(self, canvas, onQuit=None):
+    def __init__(self, canvas, manager):
         self.canvas = canvas
-        self.onQuit = onQuit
+        self.manager = manager
         screenWidth, screenHeight = canvas.get_size()
 
         self.player = Player.fromAssets(ASSETS_DIR, PLAYER_START, PLAYER_SIZE)
@@ -66,8 +66,10 @@ class Game:
         self.gameOverScreen.hide()
 
     def _quit(self):
-        if self.onQuit:
-            self.onQuit()
+        self.manager.setScreen(StartScreen(self.canvas, onStart=self._startNewGame))
+
+    def _startNewGame(self):
+        self.manager.setScreen(Game(self.canvas, self.manager))
 
     def togglePause(self):
         if self.player is None:

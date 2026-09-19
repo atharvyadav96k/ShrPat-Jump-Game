@@ -11,15 +11,5 @@ SCREEN_HEIGHT = 720
 canvas = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.RESIZABLE)
 
 manager = ScreenManager(canvas)
-
-
-def showStartScreen():
-    manager.setScreen(StartScreen(canvas, onStart=showGame))
-
-
-def showGame():
-    manager.setScreen(Game(canvas, onQuit=showStartScreen))
-
-
-showStartScreen()
+manager.setScreen(StartScreen(canvas, onStart=lambda: manager.setScreen(Game(canvas, manager))))
 manager.run()
