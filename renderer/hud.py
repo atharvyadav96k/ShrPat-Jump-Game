@@ -11,13 +11,15 @@ class HUD:
         if self.player is None:
             return
 
+        hudLeft = 110  # clears the pause button drawn in the top-left corner
+
         healthText = f"Health: {self.player.health}/{self.player.maxHealth}"
         healthSurface = self.font.render(healthText, True, (255, 255, 255))
-        healthRect = healthSurface.get_rect(topleft=(10, 10))
+        healthRect = healthSurface.get_rect(topleft=(hudLeft, 10))
         self.canvas.blit(healthSurface, healthRect)
 
         scoreSurface = self.font.render(f"Score: {self.player.score}", True, (255, 255, 255))
-        scoreRect = scoreSurface.get_rect(topleft=(10, healthRect.bottom + 4))
+        scoreRect = scoreSurface.get_rect(topleft=(hudLeft, healthRect.bottom + 4))
         self.canvas.blit(scoreSurface, scoreRect)
 
         if self.player.airJumpLocked:
