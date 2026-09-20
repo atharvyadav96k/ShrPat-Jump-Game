@@ -3,8 +3,9 @@ import pygame
 from objects import Image
 from animation import Animator
 from .killObstacle import KillObstacle
+from paths import ASSETS_DIR
 
-SAW_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "gameobjects", "saw")
+SAW_DIR = os.path.join(ASSETS_DIR, "gameobjects", "saw")
 SAW_FRAME_DURATION = 0.08
 
 _sawFramesCache = None

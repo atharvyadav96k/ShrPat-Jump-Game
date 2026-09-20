@@ -3,11 +3,12 @@ import pygame
 from objects import Rectangle, Image
 from animation import Animator
 from gameevents.controllableObject import ControllableObject
+from paths import ASSETS_DIR
 
 
 DESTROY_DELAY = 0.3
 WOOD_COLOR = (139, 69, 19)
-WOODBOX_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "ground", "woodbox")
+WOODBOX_DIR = os.path.join(ASSETS_DIR, "ground", "woodbox")
 
 _woodboxFramesCache = None
 

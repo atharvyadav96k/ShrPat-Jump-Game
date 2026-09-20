@@ -3,9 +3,10 @@ import pygame
 from objects import Rectangle, TiledAnimatedImage
 from animation import Animator
 from gameevents.controllableObject import ControllableObject
+from paths import ASSETS_DIR
 
 KILL_COLOR = (200, 0, 0)
-LAVA_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "ground", "lava")
+LAVA_DIR = os.path.join(ASSETS_DIR, "ground", "lava")
 LAVA_FRAME_DURATION = 0.15
 
 _lavaFramesCache = None

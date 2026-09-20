@@ -4,8 +4,9 @@ import pygame
 from objects import Image
 from animation import Animator
 from gameevents.controllableObject import ControllableObject
+from paths import ASSETS_DIR
 
-COINS_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "gameobjects", "coins")
+COINS_DIR = os.path.join(ASSETS_DIR, "gameobjects", "coins")
 YELLOW_COIN_DIR = os.path.join(COINS_DIR, "yellow")
 BLUE_COIN_DIR = os.path.join(COINS_DIR, "blue")
 COIN_FRAME_DURATION = 0.08

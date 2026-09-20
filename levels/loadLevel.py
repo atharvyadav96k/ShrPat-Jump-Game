@@ -3,11 +3,12 @@ import pygame
 from objects import TiledImage
 from gameobjects import Ground, WoodBox, KillObstacle, HorizontalMovingKillObstacle, VerticalMovingKillObstacle, ScoreCoin, JumpCoin, FallingPlatform
 from .map import map as DEFAULT_MAP
+from paths import ASSETS_DIR
 
 TILE_SIZE = 50
 GROUND_TOP_INSET = 10
 GROUND_Z_INDEX = 4
-GRASS_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "ground", "grass")
+GRASS_DIR = os.path.join(ASSETS_DIR, "ground", "grass")
 MOVING_KILL_TRAVEL_TILES = 4
 MOVING_KILL_SPEED = 100
 

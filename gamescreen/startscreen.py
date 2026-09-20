@@ -1,9 +1,10 @@
 import os
 import pygame
 from ui import Root, Image, Text, Button
+from paths import ASSETS_DIR
 
-BG_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "..", "assets", "bg.png")
-PLAY_BUTTON_FRAMES_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "ui", "buttons", "press")
+BG_IMAGE_PATH = os.path.join(ASSETS_DIR, "bg.png")
+PLAY_BUTTON_FRAMES_DIR = os.path.join(ASSETS_DIR, "ui", "buttons", "press")
 
 
 def _loadFrameSequence(dirPath):

@@ -8,6 +8,7 @@ from levels.maps import MAPS
 from gamescreen import GameOverScreen, PauseScreen, StartScreen, LevelSelectScreen, WinScreen
 from ui import Root, Button
 from gamelogger import logger
+from paths import ASSETS_DIR as ASSETS_ROOT
 
 EDGE_ZOOM_MARGIN = 80
 ZOOM_DURATION = 0.4
@@ -18,10 +19,10 @@ CAMERA_ZOOM = 1.2
 EDGE_ZOOM_OUT_FACTOR = 0.6
 MIN_ZOOM = CAMERA_ZOOM * EDGE_ZOOM_OUT_FACTOR
 
-ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets", "female-character")
-BG_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "assets", "bg.png")
+ASSETS_DIR = os.path.join(ASSETS_ROOT, "female-character")
+BG_IMAGE_PATH = os.path.join(ASSETS_ROOT, "bg.png")
 BACKGROUND_PARALLAX = 0.8
-PAUSE_BUTTON_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "assets", "ui", "buttons", "pause", "pause_button.png")
+PAUSE_BUTTON_IMAGE_PATH = os.path.join(ASSETS_ROOT, "ui", "buttons", "pause", "pause_button.png")
 
 
 def _showLevelSelect(canvas, manager):
