@@ -10,7 +10,7 @@ class Player(ControllableObject):
     _frameCache = {}
     MAX_AIR_JUMPS_CAP = 3
 
-    def __init__(self, gameObject, walkSpeed=200, jumpForce=400, maxAirJumps=1, airJumpRefillTime=5,
+    def __init__(self, gameObject, walkSpeed=200, jumpForce=560, maxAirJumps=1, airJumpRefillTime=5,
                  gravityAccel=900, friction=0, zIndex=1, maxHealth=100):
         super().__init__(gameObject, collidable=True, gravity=True, gravityAccel=gravityAccel, friction=friction, zIndex=zIndex)
         self.maxHealth = maxHealth
