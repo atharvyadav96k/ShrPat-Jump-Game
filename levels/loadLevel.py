@@ -74,7 +74,7 @@ def loadLevel(levelMap=None):
             y = row * TILE_SIZE
 
             if cell == '$':
-                grounds.append(WoodBox.fromRect([x, y], [TILE_SIZE, TILE_SIZE]))
+                grounds.append(WoodBox.fromAssets([x, y], [TILE_SIZE, TILE_SIZE]))
             elif cell == 'H':
                 grounds.append(HorizontalMovingKillObstacle.fromAssets(
                     [x, y], [TILE_SIZE, TILE_SIZE], travelDistance=TILE_SIZE * MOVING_KILL_TRAVEL_TILES, speed=MOVING_KILL_SPEED
