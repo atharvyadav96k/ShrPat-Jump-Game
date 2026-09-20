@@ -1,8 +1,8 @@
-from objects import Rectangle
+from objects import Rectangle, Image
 from gameevents.controllableObject import ControllableObject
 
 
-FALL_DELAY = 0.3
+FALL_DELAY = 0.2
 PLATFORM_COLOR = (150, 90, 40)
 
 
@@ -17,6 +17,10 @@ class FallingPlatform(ControllableObject):
     @classmethod
     def fromRect(cls, position, size, color=PLATFORM_COLOR):
         return cls(Rectangle(f"fallplatform_{position[0]}_{position[1]}", position, size, color))
+
+    @classmethod
+    def fromAssets(cls, position, size, image):
+        return cls(Image(f"fallplatform_{position[0]}_{position[1]}", position, size, image))
 
     def onCollision(self, other):
         super().onCollision(other)

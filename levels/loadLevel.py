@@ -81,6 +81,8 @@ def loadLevel(levelMap=None):
             if cell == 'F':
                 x = col * TILE_SIZE
                 y = row * TILE_SIZE
-                grounds.append(FallingPlatform.fromRect([x, y], [TILE_SIZE, TILE_SIZE]))
+                platform = FallingPlatform.fromAssets([x, y], [TILE_SIZE, TILE_SIZE], grassTiles[0])
+                platform.setHitbox(offset=(0, GROUND_TOP_INSET), size=(TILE_SIZE, TILE_SIZE - GROUND_TOP_INSET))
+                grounds.append(platform)
 
     return grounds
