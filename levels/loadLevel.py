@@ -11,6 +11,9 @@ GRASS_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "ground", "g
 MOVING_KILL_TRAVEL_TILES = 4
 MOVING_KILL_SPEED = 100
 
+MERGED_TILES = ('_', '!')
+SINGLE_TILES = ('$', 'H', 'V', 'Y', 'B', 'F')
+
 
 def _loadGrassTiles():
     entries = [f for f in os.listdir(GRASS_DIR) if os.path.splitext(f)[0].isdigit()]
@@ -31,7 +34,7 @@ def _mergeRuns(cells):
 
     while col < len(cells):
         cell = cells[col]
-        if cell not in ('_', '$', '!', 'H', 'V', 'Y', 'B'):
+        if cell not in MERGED_TILES:
             col += 1
             continue
 
@@ -60,27 +63,31 @@ def loadLevel(levelMap=None):
                 ground = Ground(gameObject, zIndex=GROUND_Z_INDEX)
                 ground.setHitbox(offset=(0, GROUND_TOP_INSET), size=(width, TILE_SIZE - GROUND_TOP_INSET))
                 grounds.append(ground)
-            elif cell == '$':
-                grounds.append(WoodBox.fromRect([x, y], [width, TILE_SIZE]))
             elif cell == '!':
                 grounds.append(KillObstacle.fromAssets([x, y], [width, TILE_SIZE]))
+
+        for col, cell in enumerate(cells):
+            if cell not in SINGLE_TILES:
+                continue
+
+            x = col * TILE_SIZE
+            y = row * TILE_SIZE
+
+            if cell == '$':
+                grounds.append(WoodBox.fromRect([x, y], [TILE_SIZE, TILE_SIZE]))
             elif cell == 'H':
                 grounds.append(HorizontalMovingKillObstacle.fromAssets(
-                    [x, y], [width, TILE_SIZE], travelDistance=TILE_SIZE * MOVING_KILL_TRAVEL_TILES, speed=MOVING_KILL_SPEED
+                    [x, y], [TILE_SIZE, TILE_SIZE], travelDistance=TILE_SIZE * MOVING_KILL_TRAVEL_TILES, speed=MOVING_KILL_SPEED
                 ))
             elif cell == 'V':
                 grounds.append(VerticalMovingKillObstacle.fromAssets(
-                    [x, y], [width, TILE_SIZE], travelDistance=TILE_SIZE * MOVING_KILL_TRAVEL_TILES, speed=MOVING_KILL_SPEED
+                    [x, y], [TILE_SIZE, TILE_SIZE], travelDistance=TILE_SIZE * MOVING_KILL_TRAVEL_TILES, speed=MOVING_KILL_SPEED
                 ))
             elif cell == 'Y':
-                grounds.append(ScoreCoin.fromAssets([x, y], [width, TILE_SIZE]))
+                grounds.append(ScoreCoin.fromAssets([x, y], [TILE_SIZE, TILE_SIZE]))
             elif cell == 'B':
-                grounds.append(JumpCoin.fromAssets([x, y], [width, TILE_SIZE]))
-
-        for col, cell in enumerate(cells):
-            if cell == 'F':
-                x = col * TILE_SIZE
-                y = row * TILE_SIZE
+                grounds.append(JumpCoin.fromAssets([x, y], [TILE_SIZE, TILE_SIZE]))
+            elif cell == 'F':
                 platform = FallingPlatform.fromAssets([x, y], [TILE_SIZE, TILE_SIZE], grassTiles[0])
                 platform.setHitbox(offset=(0, GROUND_TOP_INSET), size=(TILE_SIZE, TILE_SIZE - GROUND_TOP_INSET))
                 grounds.append(platform)

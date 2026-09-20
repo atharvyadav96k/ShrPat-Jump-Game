@@ -11,7 +11,7 @@ class HUD:
         if self.player is None:
             return
 
-        hudLeft = 110  # clears the pause button drawn in the top-left corner
+        hudLeft = 110
 
         healthText = f"Health: {self.player.health}/{self.player.maxHealth}"
         healthSurface = self.font.render(healthText, True, (255, 255, 255))
