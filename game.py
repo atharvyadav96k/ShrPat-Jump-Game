@@ -7,6 +7,7 @@ from levels import loadLevel, getLevelSize
 from levels.maps import MAPS
 from gamescreen import GameOverScreen, PauseScreen, StartScreen, LevelSelectScreen, WinScreen
 from ui import Root, Button
+from gamelogger import logger
 
 EDGE_ZOOM_MARGIN = 80
 ZOOM_DURATION = 0.4
@@ -74,6 +75,12 @@ class Game:
             text="", onClick=self.togglePause, image=pauseButtonImage,
         ))
 
+        logger.info(
+            "level started: levelMap=%s objects=%d totalCoins=%d",
+            "default" if self.levelMap is None else f"map(rows={len(self.levelMap)})",
+            len(self.objects), self.totalCoins,
+        )
+
     def restart(self):
         self.player = Player.fromAssets(ASSETS_DIR, PLAYER_START, PLAYER_SIZE)
         grounds = loadLevel(self.levelMap)
@@ -87,11 +94,14 @@ class Game:
         self.won = False
         self.winScreen.hide()
 
+        logger.info("level restarted: objects=%d totalCoins=%d", len(self.objects), self.totalCoins)
+
     @staticmethod
     def _countCoins(objects):
         return sum(1 for obj in objects if isinstance(obj, (ScoreCoin, JumpCoin)))
 
     def _quit(self):
+        logger.info("quit to start screen")
         self.manager.setScreen(buildStartScreen(self.canvas, self.manager))
 
     def togglePause(self):
@@ -99,6 +109,7 @@ class Game:
             return
 
         self.paused = not self.paused
+        logger.debug("pause toggled: paused=%s", self.paused)
 
         if self.paused:
             self.pauseScreen.show()
@@ -136,6 +147,7 @@ class Game:
         self.objects[:] = [obj for obj in self.objects if not getattr(obj, "destroyed", False)]
 
         if self.player is not None and self.player.destroyed:
+            logger.info("player removed after death animation")
             self.hud.player = None
             self.player = None
             self.gameOverScreen.show()
@@ -144,6 +156,7 @@ class Game:
             self.gameOverScreen.update(delta)
 
         if self.player is not None and self.totalCoins > 0 and self._countCoins(self.objects) == 0:
+            logger.info("all coins collected, player won")
             self.won = True
             self.winScreen.show()
 

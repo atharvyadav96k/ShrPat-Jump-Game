@@ -3,6 +3,7 @@ import pygame
 from objects import Image
 from animation import Animator
 from gameevents.controllableObject import ControllableObject
+from gamelogger import logger
 
 
 class Player(ControllableObject):
@@ -32,8 +33,8 @@ class Player(ControllableObject):
         self.destroyed = False
         self.score = 0
 
-        self.bindSpeedKey(pygame.K_LEFT, 180, walkSpeed)
-        self.bindSpeedKey(pygame.K_RIGHT, 0, walkSpeed)
+        self.bindSpeedKey(pygame.K_a, 180, walkSpeed)
+        self.bindSpeedKey(pygame.K_d, 0, walkSpeed)
 
     def jump(self):
         if self.grounded:
@@ -41,20 +42,27 @@ class Player(ControllableObject):
             self.applyForce(270, self.jumpForce)
             self.grounded = False
             self._setAnimState("jump", restart=True)
+            logger.debug("jump: ground jump at pos=%s", self.getBounds())
             return
 
         if self.airJumpsRemaining <= 0 or self.airJumpLocked:
+            logger.debug(
+                "jump: blocked (airJumpsRemaining=%d, locked=%s) at pos=%s",
+                self.airJumpsRemaining, self.airJumpLocked, self.getBounds(),
+            )
             return
 
         self.vy = 0
         self.applyForce(270, self.jumpForce)
         self.airJumpsRemaining -= 1
         self._setAnimState("jump", restart=True)
+        logger.debug("jump: air jump used, remaining=%d at pos=%s", self.airJumpsRemaining, self.getBounds())
 
         if self.airJumpsRemaining <= 0:
             self.airJumpLocked = True
             self.airJumpTimer = 0
             self.maxAirJumps = self.baseMaxAirJumps
+            logger.debug("jump: air jumps exhausted, maxAirJumps reset to %d", self.maxAirJumps)
 
     def refillAirJumps(self):
         self.airJumpsRemaining = self.maxAirJumps
@@ -73,7 +81,9 @@ class Player(ControllableObject):
             return
 
         self.health = max(0, self.health - amount)
+        logger.info("takeDamage: amount=%d health=%d/%d pos=%s", amount, self.health, self.maxHealth, self.getBounds())
         if not self.isAlive():
+            logger.info("player died at pos=%s", self.getBounds())
             self._setAnimState("die", restart=True)
 
     def heal(self, amount):
@@ -145,13 +155,16 @@ class Player(ControllableObject):
         return "walk" if self.isWalking() else "idle"
 
     def handleKeyDown(self, key):
-        if key == pygame.K_UP:
+        if not self.isAlive():
+            return
+
+        if key == pygame.K_w:
             self.jump()
             return
 
-        if key == pygame.K_LEFT:
+        if key == pygame.K_a:
             self.setFacing(180)
-        elif key == pygame.K_RIGHT:
+        elif key == pygame.K_d:
             self.setFacing(0)
 
         super().handleKeyDown(key)
@@ -183,8 +196,15 @@ class Player(ControllableObject):
 
         super().update(delta)
 
+        if wasGrounded and not self.grounded:
+            logger.debug("player left ground at pos=%s vy=%.1f", self.getBounds(), self.vy)
+
     def onCollision(self, other):
         wasFalling = self.vy > 0
+        logger.debug(
+            "collision: other=%s type=%s pos=%s otherPos=%s vy=%.1f",
+            other.getObjName(), type(other).__name__, self.getBounds(), other.getBounds(), self.vy,
+        )
         super().onCollision(other)
 
         if wasFalling and self.vy == 0:
@@ -192,3 +212,4 @@ class Player(ControllableObject):
             self.grounded = True
             self.groundY = self.getBounds()[1]
             self.refillAirJumps()
+            logger.debug("player landed on %s at pos=%s", other.getObjName(), self.getBounds())

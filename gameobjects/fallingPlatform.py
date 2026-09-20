@@ -1,5 +1,6 @@
 from objects import Rectangle, Image
 from gameevents.controllableObject import ControllableObject
+from gamelogger import logger
 
 
 FALL_DELAY = 0.2
@@ -28,6 +29,10 @@ class FallingPlatform(ControllableObject):
         if not self.touched and not self.falling:
             self.touched = True
             self.fallTimer = 0
+            logger.debug(
+                "fallingPlatform %s touched by %s at pos=%s",
+                self.getObjName(), other.getObjName(), self.getBounds(),
+            )
 
     def update(self, delta):
         if self.touched and not self.falling:
@@ -36,5 +41,6 @@ class FallingPlatform(ControllableObject):
                 self.falling = True
                 self.disableCollision()
                 self.enableGravity(self.fallGravityAccel)
+                logger.debug("fallingPlatform %s started falling at pos=%s", self.getObjName(), self.getBounds())
 
         super().update(delta)
