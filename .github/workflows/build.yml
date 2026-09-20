@@ -1,0 +1,49 @@
+name: Build game binaries
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: 2d-game-ubuntu
+            sep: ":"
+          - os: windows-latest
+            artifact: 2d-game-windows
+            sep: ";"
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
+
+      - name: Build binary
+        run: >
+          pyinstaller --onefile --windowed --name 2d-game
+          --add-data "assets${{ matrix.sep }}assets"
+          main.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            dist/2d-game
+            dist/2d-game.exe
+          if-no-files-found: ignore
