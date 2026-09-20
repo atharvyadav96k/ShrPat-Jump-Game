@@ -1,7 +1,7 @@
 import os
 import pygame
 from objects import TiledImage
-from gameobjects import Ground, WoodBox, KillObstacle, HorizontalMovingKillObstacle, VerticalMovingKillObstacle, ScoreCoin, JumpCoin
+from gameobjects import Ground, WoodBox, KillObstacle, HorizontalMovingKillObstacle, VerticalMovingKillObstacle, ScoreCoin, JumpCoin, FallingPlatform
 from .map import map as DEFAULT_MAP
 
 TILE_SIZE = 50
@@ -76,5 +76,11 @@ def loadLevel(levelMap=None):
                 grounds.append(ScoreCoin.fromAssets([x, y], [width, TILE_SIZE]))
             elif cell == 'B':
                 grounds.append(JumpCoin.fromAssets([x, y], [width, TILE_SIZE]))
+
+        for col, cell in enumerate(cells):
+            if cell == 'F':
+                x = col * TILE_SIZE
+                y = row * TILE_SIZE
+                grounds.append(FallingPlatform.fromRect([x, y], [TILE_SIZE, TILE_SIZE]))
 
     return grounds
